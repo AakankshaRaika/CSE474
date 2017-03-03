@@ -241,13 +241,13 @@ def nnPredict(w1, w2, data):
     % label: a column vector of predicted labels"""
     
     # Your code here
-    _, sig_output = nnLayerVals(w1,w2,data)    
+    _, sig_output = nnFeedForward(w1,w2,data)    
     labels = np.argmax(sig_output, axis=1)
 
     return labels
     
-def nnLayerVals(w1,w2,data):
-    """% nnLayerVals calculatesd the values in each layer of the neural network
+def nnFeedForward(w1,w2,data):
+    """% nnFeedForward calculatesd the values in each layer of the neural network
 
     % Input:
     % w1: matrix of weights of connections from input layer to hidden layers.
