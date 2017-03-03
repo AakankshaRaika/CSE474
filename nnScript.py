@@ -130,10 +130,19 @@ def preprocess():
     # boolean vector of indexes with at least 2 values from the training data
     valid_idx = np.var(train_data, axis=0) > 0
 
-    # only keep indexes with variance
+    # only keep indexes with variance, plus put in the bias term at the end
     train_data = train_data[:,valid_idx]
+    train_data_y, train_data_x = train_data.shape
+    train_data = np.c_[train_data, np.ones(train_data_y)]
+
     validation_data = validation_data[:,valid_idx]
+    validation_data_y, validation_data_x = validation_data.shape
+    validation_data = np.c_[validation_data, np.ones(validation_data_y)]
+
     test_data = test_data[:,valid_idx]
+    test_data_y, test_data_x = test_data.shape
+    test_data = np.c_[test_data, np.ones(test_data_y)]
+
 
     # scale to be from 0 to 1
     train_data = train_data / 255.0
@@ -222,9 +231,18 @@ def nnPredict(w1, w2, data):
        
     % Output: 
     % label: a column vector of predicted labels"""
+    
+    # Your code here
 
     labels = np.array([])
-    # Your code here
+    
+    hidden_layer = np.dot(data, w1)
+    sig_hidden = sigmoid(hidden_layer)
+    
+    output = np.dot(sig_hidden,w2)
+    sig_output = sigmoid(output)
+    
+    labels = np.argmax(sig_output, axis=1)
 
     return labels
 
