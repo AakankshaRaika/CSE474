@@ -26,6 +26,12 @@ def sigmoid(z):
     # return the sigmoid of input z"""
 
     return  1 / (1 + np.exp(-z))
+    
+def deriv_sigmoid(z):
+    """# Notice that z can be a scalar, a vector or a matrix
+    # return the sigmoid of input z"""
+
+    return  sigmoid(z) * (1 - sigmoid(z))
 
 
 def preprocess():
@@ -132,16 +138,16 @@ def preprocess():
 
     # only keep indexes with variance, plus put in the bias term at the end
     train_data = train_data[:,valid_idx]
-    train_data_y, train_data_x = train_data.shape
-    train_data = np.c_[train_data, np.ones(train_data_y)]
+    # train_data_y, train_data_x = train_data.shape
+    # train_data = np.c_[train_data, np.ones(train_data_y)]
 
     validation_data = validation_data[:,valid_idx]
-    validation_data_y, validation_data_x = validation_data.shape
-    validation_data = np.c_[validation_data, np.ones(validation_data_y)]
+    # validation_data_y, validation_data_x = validation_data.shape
+    # validation_data = np.c_[validation_data, np.ones(validation_data_y)]
 
     test_data = test_data[:,valid_idx]
-    test_data_y, test_data_x = test_data.shape
-    test_data = np.c_[test_data, np.ones(test_data_y)]
+    # test_data_y, test_data_x = test_data.shape
+    # test_data = np.c_[test_data, np.ones(test_data_y)]
 
 
     # scale to be from 0 to 1
@@ -193,10 +199,14 @@ def nnObjFunction(params, *args):
     %     layer to unit i in output layer."""
 
     n_input, n_hidden, n_class, training_data, training_label, lambdaval = args
-
+    # changed because I put the extra 1 in the data to begin with, so it should be accounted for already
     w1 = params[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
     w2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
     obj_val = 0
+    
+    training_data_y, training_data_x = training_data.shape
+    in_data = np.c_[train_data, np.ones(training_data_y)]
+
 
     # Your code here
     #
@@ -210,7 +220,7 @@ def nnObjFunction(params, *args):
     # Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     # you would use code similar to the one below to create a flat array
     # obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
-    obj_grad = np.array([])
+    obj_grad = np.array([0])
 
     return (obj_val, obj_grad)
 
@@ -233,18 +243,38 @@ def nnPredict(w1, w2, data):
     % label: a column vector of predicted labels"""
     
     # Your code here
+    _, sig_output = nnLayerVals(w1,w2,data)    
+    labels = np.argmax(sig_output, axis=1)
 
-    labels = np.array([])
+    return labels
     
-    hidden_layer = np.dot(data, w1)
+def nnLayerVals(w1,w2,data):
+    """% nnLayerVals calculatesd the values in each layer of the neural network
+
+    % Input:
+    % w1: matrix of weights of connections from input layer to hidden layers.
+    %     w1(i, j) represents the weight of connection from unit i in input 
+    %     layer to unit j in hidden layer.
+    % w2: matrix of weights of connections from hidden layer to output layers.
+    %     w2(i, j) represents the weight of connection from unit i in input 
+    %     layer to unit j in hidden layer.
+    % data: matrix of data. Each row of this matrix represents the feature 
+    %       vector of a particular image
+       
+    % Output: 
+    % sig_hidden: a matrix of hidden layer values
+    % sig_output: a matrix of output layer values """
+    
+    data_y, data_x = data.shape
+    in_data = np.c_[train_data, np.ones(data_y)]
+    
+    hidden_layer = np.dot(in_data, w1)
     sig_hidden = sigmoid(hidden_layer)
     
     output = np.dot(sig_hidden,w2)
     sig_output = sigmoid(output)
     
-    labels = np.argmax(sig_output, axis=1)
-
-    return labels
+    return sig_hidden, sig_output
 
 
 """**************Neural Network Script Starts here********************************"""
