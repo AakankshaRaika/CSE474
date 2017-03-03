@@ -107,26 +107,39 @@ def preprocess():
     train_perm = np.random.permutation(train_size)
     train_data = train_preprocess[train_perm]
     train_data = np.double(train_data)
-    train_data = train_data / 255.0
+    #train_data = train_data / 255.0
     train_label = train_label_preprocess[train_perm]
 
     validation_size = range(validation_preprocess.shape[0])
     vali_perm = np.random.permutation(validation_size)
     validation_data = validation_preprocess[vali_perm]
     validation_data = np.double(validation_data)
-    validation_data = validation_data / 255.0
+    #validation_data = validation_data / 255.0
     validation_label = validation_label_preprocess[vali_perm]
 
     test_size = range(test_preprocess.shape[0])
     test_perm = np.random.permutation(test_size)
     test_data = test_preprocess[test_perm]
     test_data = np.double(test_data)
-    test_data = test_data / 255.0
+    #test_data = test_data / 255.0
     test_label = test_label_preprocess[test_perm]
 
     # Feature selection
     # Your code here.
+    
+    # boolean vector of indexes with at least 2 values from the training data
+    valid_idx = np.var(train_data, axis=0) > 0
 
+    # only keep indexes with variance
+    train_data = train_data[:,valid_idx]
+    validation_data = validation_data[:,valid_idx]
+    test_data = test_data[:,valid_idx]
+
+    # scale to be from 0 to 1
+    train_data = train_data / 255.0
+    validation_data = validation_data / 255.0
+    test_data = test_data / 255.0
+    
     print('preprocess done')
 
     return train_data, train_label, validation_data, validation_label, test_data, test_label
