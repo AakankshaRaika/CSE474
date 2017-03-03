@@ -199,14 +199,11 @@ def nnObjFunction(params, *args):
     %     layer to unit i in output layer."""
 
     n_input, n_hidden, n_class, training_data, training_label, lambdaval = args
-    # changed because I put the extra 1 in the data to begin with, so it should be accounted for already
+
     w1 = params[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
     w2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
     obj_val = 0
     
-    training_data_y, training_data_x = training_data.shape
-    in_data = np.c_[train_data, np.ones(training_data_y)]
-
 
     # Your code here
     #
@@ -214,7 +211,8 @@ def nnObjFunction(params, *args):
     #
     #
     #
-
+    training_data_y, training_data_x = training_data.shape
+    in_data = np.c_[train_data, np.ones(training_data_y)]
 
 
     # Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
@@ -264,17 +262,21 @@ def nnLayerVals(w1,w2,data):
     % Output: 
     % sig_hidden: a matrix of hidden layer values
     % sig_output: a matrix of output layer values """
+    w1 = np.transpose(w1)
+    w2 = np.transpose(w2)
     
     data_y, data_x = data.shape
-    in_data = np.c_[train_data, np.ones(data_y)]
+    in_data = np.c_[data, np.ones(data_y)]
     
     hidden_layer = np.dot(in_data, w1)
     sig_hidden = sigmoid(hidden_layer)
+    sig_hidden_y, sig_hidden_x = hidden_layer.shape
+    sig_hidden = np.c_[sig_hidden, np.ones(sig_hidden_y)]
     
     output = np.dot(sig_hidden,w2)
     sig_output = sigmoid(output)
     
-    return sig_hidden, sig_output
+    return sig_hidden[:,:-1], sig_output[:,:]
 
 
 """**************Neural Network Script Starts here********************************"""
