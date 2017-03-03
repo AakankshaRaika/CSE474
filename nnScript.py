@@ -25,7 +25,7 @@ def sigmoid(z):
     """# Notice that z can be a scalar, a vector or a matrix
     # return the sigmoid of input z"""
 
-    return  1 / (1 + np.exp(-z))
+    return  1 / (1 + np.exp(z))
 
 
 def preprocess():
