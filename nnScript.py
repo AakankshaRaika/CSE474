@@ -126,6 +126,20 @@ def preprocess():
 
     # Feature selection
     # Your code here.
+    
+    bool_index = np.equal.reduce(train_preprocess) #this will give me bool values for indexes that are equal in valu$
+    index = np.where(~train_preprocess.any(axis=0))[0] # this will give me indexes of all the colums with 0.
+
+    train_data = train_data[:,bool_index]
+    train_data = train_data / 255.0
+    #print ("this is the train data after triming :")
+    #print (train_data)
+
+    validation_data = validation_data[:,bool_index]
+    validation_data = validation_data / 255.0
+
+    test_data = test_data[:,bool_index]
+    test_data = test_data / 255.0
 
     print('preprocess done')
 
