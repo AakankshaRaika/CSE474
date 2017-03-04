@@ -113,51 +113,44 @@ def preprocess():
     train_perm = np.random.permutation(train_size)
     train_data = train_preprocess[train_perm]
     train_data = np.double(train_data)
-    #train_data = train_data / 255.0
     train_label = train_label_preprocess[train_perm]
 
     validation_size = range(validation_preprocess.shape[0])
     vali_perm = np.random.permutation(validation_size)
     validation_data = validation_preprocess[vali_perm]
     validation_data = np.double(validation_data)
-    #validation_data = validation_data / 255.0
     validation_label = validation_label_preprocess[vali_perm]
 
     test_size = range(test_preprocess.shape[0])
     test_perm = np.random.permutation(test_size)
     test_data = test_preprocess[test_perm]
     test_data = np.double(test_data)
-    #test_data = test_data / 255.0
     test_label = test_label_preprocess[test_perm]
+
 
     # Feature selection
     # Your code here.
     
-    # boolean vector of indexes with at least 2 values from the training data
-    valid_idx = np.var(train_data, axis=0) > 0
-
-    # only keep indexes with variance, plus put in the bias term at the end
-    train_data = train_data[:,valid_idx]
-    # train_data_y, train_data_x = train_data.shape
-    # train_data = np.c_[train_data, np.ones(train_data_y)]
-
-    validation_data = validation_data[:,valid_idx]
-    # validation_data_y, validation_data_x = validation_data.shape
-    # validation_data = np.c_[validation_data, np.ones(validation_data_y)]
-
-    test_data = test_data[:,valid_idx]
-    # test_data_y, test_data_x = test_data.shape
-    # test_data = np.c_[test_data, np.ones(test_data_y)]
 
 
-    # scale to be from 0 to 1
+    #this is reducing it to colunms vs 50k*784 values. 
+    bool_index =  np.all(train_preprocess == train_preprocess[0,:] , axis = 0) #this will give me bool values for indexes that are equal in value for that columbs
+    
+    index_zeros = np.where(~train_preprocess.any(axis=0))[0] # this will give me indexes of all the colums with 0.
+    index_Ignored_Columns = np.where(np.all(train_preprocess == train_preprocess[0,:] , axis = 0))
+
+    train_data = train_data[:,bool_index]
     train_data = train_data / 255.0
+
+    validation_data = validation_data[:,bool_index]
     validation_data = validation_data / 255.0
+
+    test_data = test_data[:,bool_index]
     test_data = test_data / 255.0
     
     print('preprocess done')
 
-    return train_data, train_label, validation_data, validation_label, test_data, test_label
+    return train_data, train_label, validation_data, validation_label, test_data, test_label, index_zeros, index_Ignored_Columns 
 
 
 def nnObjFunction(params, *args):
@@ -281,7 +274,7 @@ def nnFeedForward(w1,w2,data):
 
 """**************Neural Network Script Starts here********************************"""
 
-train_data, train_label, validation_data, validation_label, test_data, test_label = preprocess()
+train_data, train_label, validation_data, validation_label, test_data, test_label , index_zeros, index_Ignored_Columns = preprocess()
 
 #  Train Neural Network
 
