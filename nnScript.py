@@ -8,6 +8,7 @@ import datetime as dt
 import pickle
 
 truth_matrix = np.zeros((50000, 10))
+global index_selected_columns
 index_selected_columns = np.zeros((1))
 
 def initializeWeights(n_in, n_out):
@@ -121,7 +122,7 @@ def preprocess():
     global truth_matrix
 
     for i in range(50000):
-        truth_matrix[i,train_label[i]] = 1
+        truth_matrix[i,int(train_label[i])] = 1
     
 
 
@@ -411,7 +412,7 @@ for n_hidden in hidden_vals:
             
             predicted_label = nnPredict(w1, w2, train_data)
             
-            global index_selected_columns
+            
             obj = [index_selected_columns, n_hidden, w1, w2, lamdaval]
 
             #Dump the data
