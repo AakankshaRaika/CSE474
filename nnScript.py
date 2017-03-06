@@ -8,7 +8,7 @@ import datetime as dt
 import pickle
 
 truth_matrix = np.zeros((50000, 10))
-index_slected_columns = np.zeros((1))
+index_selected_columns = np.zeros((1))
 
 def initializeWeights(n_in, n_out):
     epsilon = sqrt(6) / sqrt(n_in + n_out + 1)
@@ -99,8 +99,8 @@ def preprocess():
     index_zeros = np.where(~train_preprocess.any(axis=0))[0] # this will give me indexes of all the colums with 0.
     index_Ignored_Columns = np.where(np.all(train_preprocess == train_preprocess[0,:] , axis = 0))
     global index_selected_columns
-    index_slected_columns = np.where(np.all(train_preprocess != train_preprocess[0,:] , axis = 0))
-    print(index_slected_columns)
+    index_selected_columns = np.where(np.all(train_preprocess != train_preprocess[0,:] , axis = 0))
+    print(index_selected_columns)
 #==============================================================================
 #     print (index_zeros)
 # 
@@ -411,8 +411,8 @@ for n_hidden in hidden_vals:
             
             predicted_label = nnPredict(w1, w2, train_data)
             
-            global index_slected_columns
-            obj = [index_slected_columns, n_hidden, w1, w2, lamdaval]
+            global index_selected_columns
+            obj = [index_selected_columns, n_hidden, w1, w2, lamdaval]
 
             #Dump the data
             pickle.dump(obj, open("test_lamda{}___hidden{}.pickle".format(lamdaval,n_hidden), 'wb'))
