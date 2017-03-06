@@ -384,7 +384,7 @@ for n_hidden in hidden_vals:
                     
                    
                    
-            args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
+            args = (n_input, n_hidden, n_class, train_data, train_label, lamdaval)
             
             # Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
             
@@ -412,7 +412,7 @@ for n_hidden in hidden_vals:
             predicted_label = nnPredict(w1, w2, train_data)
             
             global index_slected_columns
-            obj = [index_slected_columns, n_hidden, w1, w2, lambdaval]
+            obj = [index_slected_columns, n_hidden, w1, w2, lamdaval]
 
             #Dump the data
             pickle.dump(obj, open("test_lamda{}___hidden{}.pickle".format(lamdaval,n_hidden), 'wb'))
