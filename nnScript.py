@@ -5,8 +5,10 @@ from math import sqrt
 
 import datetime as dt
 
-truth_matrix = np.zeros((50000, 10))
+import pickle
 
+truth_matrix = np.zeros((50000, 10))
+index_slected_columns = np.zeros((1))
 
 def initializeWeights(n_in, n_out):
     epsilon = sqrt(6) / sqrt(n_in + n_out + 1)
@@ -96,10 +98,15 @@ def preprocess():
     
     index_zeros = np.where(~train_preprocess.any(axis=0))[0] # this will give me indexes of all the colums with 0.
     index_Ignored_Columns = np.where(np.all(train_preprocess == train_preprocess[0,:] , axis = 0))
-    print (index_zeros)
-
-    print (index_Ignored_Columns)
-
+    global index_selected_columns
+    index_slected_columns = np.where(np.all(train_preprocess != train_preprocess[0,:] , axis = 0))
+    print(index_slected_columns)
+#==============================================================================
+#     print (index_zeros)
+# 
+#     print (index_Ignored_Columns)
+# 
+#==============================================================================
 
     train_data = train_data[:,bool_index == False]
     train_data = train_data / 255.0
@@ -113,17 +120,26 @@ def preprocess():
     
     global truth_matrix
 
-    for i in range(10000):
+    for i in range(50000):
         truth_matrix[i,train_label[i]] = 1
     
 
 
-    print('preprocess done')
+    #print('preprocess done')
     return train_data, train_label, validation_data, validation_label, test_data, test_label 
 
 def ErrorFcn(w1, w2, o, n_class, n_input):
     global truth_matrix
     y = truth_matrix
+    
+    '''REMOVE THIS'''
+#==============================================================================
+#     global training_label
+#     y = np.zeros((2,2))
+#     for i in range(2):
+#         y[i,training_label[i]] = 1
+#     print(y)
+#==============================================================================
     
     A = np.log(o)
     B = np.log(1-o)
@@ -131,23 +147,39 @@ def ErrorFcn(w1, w2, o, n_class, n_input):
     pre = (np.multiply(y,A))
     post = (np.multiply((1-y),B))
     
-    error_sum =  -(1/n_input) * (np.sum( pre) + np.sum(post))
+    error_sum =  -(1/50000) * np.sum((np.multiply(y, pre) + np.multiply(1-y,post)))
+
     return error_sum
     
 def reg_ErrorFcn(w1, w2, o, n_class, n_input, lamda):
     no_reg = ErrorFcn(w1, w2, o, n_class, n_input)
-    reg_part = lamda/(2*10000) * (np.sum(np.square(w1)) + np.sum(np.square(w2)))
+
+    reg_part = lamda/(2*50000) * (np.sum(np.square(w1)) + np.sum(np.square(w2)))
     return no_reg + reg_part
     
 def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
     
     global truth_matrix
     y = truth_matrix
+    
+    '''REMOVE THIS'''
+#==============================================================================
+#     global training_label
+#     y = np.zeros((2,2))
+#     for i in range(2):
+#         y[i,training_label[i]] = 1
+#==============================================================================
 
     sigma = o-y
+    #print('sigma:\n{}'.format(sigma))
+    num_images, num_features = data.shape
+    grad_w2 = np.zeros(( n_class, n_hidden+1, num_images))
+    
+    #This loop is 3 deep, but adds an inconsequential amount of time
 
-    grad_w2 = np.zeros(( n_class, n_hidden+1, 10000))
-    for image in range(10000):
+    
+    
+    for image in range(num_images):
         for h_node in range(n_hidden+1):
             for o_node in range(n_class):
                 if (not(h_node == n_hidden)):
@@ -158,25 +190,28 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
     reg_grad_w2 = grad_w2.sum(axis=2)
 
     reg_grad_w2 = reg_grad_w2 + lamda*w2
-    reg_grad_w2 = reg_grad_w2/10000
+    reg_grad_w2 = reg_grad_w2/num_images
     
-    
-    grad_w1 = np.zeros((n_input+1, n_hidden, 10000))
-    for image in range(10000):
-        for h_node in range(n_hidden):
-            for pixel in range(n_input+1):
-                temp_sum = 0
-                for o_node in range(n_class):
-                    temp_sum += sigma[image, o_node]*w2[ o_node, h_node]
+    data_y, data_x = data.shape
+    data = np.c_[data, np.ones(data_y)]
                     
-                if not(pixel == n_input):
-                    grad_w1[pixel, h_node] = (1-z[image,h_node])*z[image,h_node]*data[image,pixel] * temp_sum
-                else:
-                    grad_w1[pixel, h_node] = (1-z[image,h_node])*z[image,h_node] * temp_sum
+                    
+    grad_w1 = np.zeros((n_input+1, n_hidden, num_images))
+    w2t = np.transpose(w2)
+    #This loop adds a prohibitive amount of time
+    for image in range(num_images):
+        #if image%10000==0 and not image == 0:
+            #print("\t\t--{} images done grad_w1 at = {}".format(image,dt.datetime.now()))
+            
+        for h_node in range(n_hidden):
+            pre = (1-z[image,h_node])*z[image,h_node] * np.sum(np.multiply(sigma[image], w2t[ h_node]) )
+            for pixel in range(n_input+1):
+                grad_w1[pixel, h_node, image] = pre * data[image,pixel] 
+
                         
-    reg_grad_w1 = grad_w1.sum(axis=2)
+    reg_grad_w1 = np.transpose(grad_w1.sum(axis=2))
     reg_grad_w1 = reg_grad_w1 + lamda * w1
-    reg_grad_w2 = reg_grad_w2/10000
+    reg_grad_w1 = reg_grad_w1/num_images
     
     return reg_grad_w1, reg_grad_w2
 
@@ -240,8 +275,8 @@ def nnObjFunction(params, *args):
 
     global numIters
     numIters+=1
-    print("The obj fn has been called {} times. (t:{})".format(numIters,dt.datetime.now()))
-    return (obj_val, obj_grad)
+    print("\t--The obj fn has been called {} times. (t:{}) \t\tObjective: {}".format(numIters,dt.datetime.now(),obj_val))
+    return obj_val, obj_grad
 
 
 def nnPredict(w1, w2, data):
@@ -268,47 +303,53 @@ def nnPredict(w1, w2, data):
 def nnFeedForward(w1,w2,data):
     w1 = np.transpose(w1)
     w2 = np.transpose(w2)
-#    print ("This is the W1 matrix")
-#    print (w1)
-#    print (" ")
-#    print ("This is the W2 matrix")
-#    print (w2)
-#    print (np.equal.reduce(w2))
-#    print (" ")
-#    print ("This is the data set :")
-#    print (data)
-#    print (np.equal.reduce(data))
-#    print (" ")
+
     data_y, data_x = data.shape
 #    
     in_data = np.c_[data, np.ones(data_y)]
-#    print ("This is data after adding bias")
-#    print (in_data)
-#    print (np.equal.reduce(in_data , axis = 0))
-#    print (" ")
+
     hidden_layer = np.dot(in_data, w1)
-#    print ("This is the hidden_layer")
-#    print (np.equal.reduce(hidden_layer))
-#    print (" ")
     sig_hidden = sigmoid(hidden_layer)
-#    print ("This is the sig_hidden")
-#    print (sig_hidden)
-#    print (" ")
     sig_hidden_y, sig_hidden_x = hidden_layer.shape
     sig_hidden = np.c_[sig_hidden, np.ones(sig_hidden_y)]
 #    
     output = np.dot(sig_hidden,w2)
-#    print ("this is the output")
-#    print (output)
-#    print (" ")
+
     sig_output = sigmoid(output)
-#    print ("this is the sig output")
-#    print (sig_output)
-#    print (" ")
+
     labels = np.argmax(sig_output, axis=1)
-#    print ("This is the label")
-#    print (labels)
     return sig_hidden[:,:-1], sig_output[:,:] , labels
+
+''' ---- JUST TEST THE OBJECTIVE --- '''
+#==============================================================================
+# n_input = 5
+# n_hidden = 3
+# n_class = 2
+# training_data = np.array([np.linspace(0,1,num=5),np.linspace(1,0,num=5)])
+# global training_label
+# training_label = np.array([0,1])
+# lambdaval = 0
+# params = np.linspace(-5,5, num=26)
+# args = (n_input, n_hidden, n_class, training_data, training_label, lambdaval)
+# objval,objgrad = nnObjFunction(params, *args)
+# print(objval)
+# print(objgrad)
+# 
+# w1 = params[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
+# w2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
+# z, o, l = nnFeedForward(w1,w2,training_data)
+# 
+#==============================================================================
+'''SHOULD OUTPUT:
+    7.87167506597
+[  5.53482145e-07   2.18344343e-06   3.81340471e-06   5.44336599e-06
+   7.07332727e-06   7.62680942e-06   2.89592552e-03   1.05820337e-02
+   1.82681419e-02   2.59542501e-02   3.36403583e-02   3.65362838e-02
+   1.23940768e-01   1.00541300e-01   7.71418319e-02   5.37423637e-02
+   3.03428956e-02   1.54283664e-01   2.48543366e-07   1.10300888e-03
+   4.52637482e-01   4.98089172e-01   1.86316859e-06   8.15058729e-03
+   4.93227000e-01   4.99915361e-01]
+   '''
 
 
 
@@ -322,57 +363,75 @@ train_data, train_label, validation_data, validation_label, test_data, test_labe
 n_input = train_data.shape[1]
 
 # set the number of nodes in hidden unit (not including bias unit)
-n_hidden = 10
+hidden_vals = [10, 50, 100, 200]
+for n_hidden in hidden_vals:
+    for lamdaval in range(0,81,10):
 
-# set the number of nodes in output unit
-n_class = 10
+        # set the number of nodes in output unit
+        n_class = 10
+        
+        # initialize the weights into some random matrices
+        initial_w1 = initializeWeights(n_input, n_hidden)
+        initial_w2 = initializeWeights(n_hidden, n_class)
+        
+        # unroll 2 weight matrices into single column vector
+        initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()), 0)
+    
+        # set the regularization hyper-parameter
+        
+        
+        with open("test_lamda{}___hidden{}.txt".format(lamdaval,n_hidden), "w") as outf:
+                    
+                   
+                   
+            args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
+            
+            # Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
+            
+            opts = {'maxiter': 50}  # Preferred value.
+            global numIters
+            numIters = 0
+            print("test: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden))
+            print("test: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden),file=outf)
+            print("Begun minimize: {}".format(dt.datetime.now()))
+            print("Begun minimize: {}".format(dt.datetime.now()),file=outf)
+            nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args, method='CG', options=opts)
+            print("End minimize: {}".format(dt.datetime.now()))
+            print("End minimize: {}".format(dt.datetime.now()),file=outf)
+            # In Case you want to use fmin_cg, you may have to split the nnObjectFunction to two functions nnObjFunctionVal
+            # and nnObjGradient. Check documentation for this function before you proceed.
+            # nn_params, cost = fmin_cg(nnObjFunctionVal, initialWeights, nnObjGradient,args = args, maxiter = 50)
+            
+            
+            # Reshape nnParams from 1D vector into w1 and w2 matrices
+            w1 = nn_params.x[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
+            w2 = nn_params.x[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
+            
+            # Test the computed parameters
+            
+            predicted_label = nnPredict(w1, w2, train_data)
+            
+            global index_slected_columns
+            obj = [index_slected_columns, n_hidden, w1, w2, lambdaval]
 
-# initialize the weights into some random matrices
-initial_w1 = initializeWeights(n_input, n_hidden)
-initial_w2 = initializeWeights(n_hidden, n_class)
-
-# unroll 2 weight matrices into single column vector
-initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()), 0)
-
-# set the regularization hyper-parameter
-lambdaval = 0
-
-args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
-
-# Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
-
-opts = {'maxiter': 50}  # Preferred value.
-global numIters
-numIters = 0
-print("Begun minimize: {}".format(dt.datetime.now()))
-nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args, method='CG', options=opts)
-print("End minimize: {}".format(dt.datetime.now()))
-# In Case you want to use fmin_cg, you may have to split the nnObjectFunction to two functions nnObjFunctionVal
-# and nnObjGradient. Check documentation for this function before you proceed.
-# nn_params, cost = fmin_cg(nnObjFunctionVal, initialWeights, nnObjGradient,args = args, maxiter = 50)
-
-
-# Reshape nnParams from 1D vector into w1 and w2 matrices
-w1 = nn_params.x[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
-w2 = nn_params.x[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
-
-# Test the computed parameters
-
-predicted_label = nnPredict(w1, w2, train_data)
-sig_h , sig_o , labelsss = nnFeedForward(w1, w2, train_data)
-
-# find the accuracy on Training Dataset
-
-print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
-
-predicted_label = nnPredict(w1, w2, validation_data)
-
-# find the accuracy on Validation Dataset
-
-print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%')
-
-predicted_label = nnPredict(w1, w2, test_data)
-
-# find the accuracy on Validation Dataset
-
-print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
+            #Dump the data
+            pickle.dump(obj, open("test_lamda{}___hidden{}.pickle".format(lamdaval,n_hidden), 'wb'))
+            
+            
+            # find the accuracy on Training Dataset
+            
+            print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
+            print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%',file=outf)
+            predicted_label = nnPredict(w1, w2, validation_data)
+            
+            # find the accuracy on Validation Dataset
+            
+            print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%')
+            print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%',file=outf)
+            predicted_label = nnPredict(w1, w2, test_data)
+            
+            # find the accuracy on Validation Dataset
+            
+            print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
+            print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%',outf)
+            print("----------\n\n\n".format(lamdaval,n_hidden))
