@@ -169,27 +169,30 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
 #     y = np.zeros((2,2))
 #     for i in range(2):
 #         y[i,training_label[i]] = 1
-#==============================================================================
 
     sigma = o-y
+    
     #print('sigma:\n{}'.format(sigma))
     num_images, num_features = data.shape
     grad_w2 = np.zeros(( n_class, n_hidden+1, num_images))
-    
-    #This loop is 3 deep, but adds an inconsequential amount of time
 
+
+   
+    z_y, z_x = z.shape
+    z_mod = np.c_[z, np.ones(z_y)]
     
+    '''uses einstein summation, super convineient'''
+    grad_w2 = np.einsum('io,ih->ohi',sigma,z_mod)
     
-    for image in range(num_images):
-        for h_node in range(n_hidden+1):
-            for o_node in range(n_class):
-                if (not(h_node == n_hidden)):
-                    grad_w2[ o_node, h_node, image] = sigma[image, o_node] * z[image, h_node]
-                else: 
-                    grad_w2[ o_node, h_node, image] = sigma[image, o_node] 
-    
+#    for image in range(num_images):
+#        for h_node in range(n_hidden+1):
+#            for o_node in range(n_class):
+#                if (not(h_node == n_hidden)):
+#                    grad_w2[ o_node, h_node, image] = sigma[image, o_node] * z[image, h_node]
+#                else: 
+#                    grad_w2[ o_node, h_node, image] = sigma[image, o_node] 
+
     reg_grad_w2 = grad_w2.sum(axis=2)
-
     reg_grad_w2 = reg_grad_w2 + lamda*w2
     reg_grad_w2 = reg_grad_w2/num_images
     
@@ -198,16 +201,31 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
                     
                     
     grad_w1 = np.zeros((n_input+1, n_hidden, num_images))
-    w2t = np.transpose(w2)
+#    w2t = np.transpose(w2)
+#    
+#    global z_v
+#    global s_v
+#    global w2t_v
+#    global gr_w1_v
+#    global t_data
+#    z_v = z
+#    s_v = sigma
+#    w2t_v = w2t
+#    t_data = data
+#    gr_w1_v = grad_w1
+    
     #This loop adds a prohibitive amount of time
-    for image in range(num_images):
-        #if image%10000==0 and not image == 0:
-            #print("\t\t--{} images done grad_w1 at = {}".format(image,dt.datetime.now()))
-            
-        for h_node in range(n_hidden):
-            pre = (1-z[image,h_node])*z[image,h_node] * np.sum(np.multiply(sigma[image], w2t[ h_node]) )
-            for pixel in range(n_input+1):
-                grad_w1[pixel, h_node, image] = pre * data[image,pixel] 
+
+    '''uses einstein summation, super convineient'''
+    pre = np.multiply(np.multiply((1-z), z), np.dot(sigma, w2[:,:-1]))
+    grad_w1 = np.einsum('ih,ip->phi',pre,data)
+    
+
+#    for image in range(num_images):
+#        for h_node in range(n_hidden):
+#            #pre = pre * np.sum(np.multiply(sigma[image], w2t[ h_node]) )
+#            for pixel in range(n_input+1):
+#                grad_w1[pixel, h_node, image] = pre[image,h_node] * data[image,pixel] 
 
                         
     reg_grad_w1 = np.transpose(grad_w1.sum(axis=2))
@@ -276,7 +294,8 @@ def nnObjFunction(params, *args):
 
     global numIters
     numIters+=1
-    print("\t--The obj fn has been called {} times. (t:{}) \t\tObjective: {}".format(numIters,dt.datetime.now(),obj_val))
+    if numIters %10==0:
+        print("\t--The obj fn has been called {} times. (t:{}) \t\tObjective: {}".format(numIters,dt.datetime.now(),obj_val))
     return obj_val, obj_grad
 
 
@@ -392,7 +411,7 @@ for n_hidden in hidden_vals:
             opts = {'maxiter': 50}  # Preferred value.
             global numIters
             numIters = 0
-            print("test: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden))
+            print("\n\n\ntest: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden))
             print("test: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden),file=outf)
             print("Begun minimize: {}".format(dt.datetime.now()))
             print("Begun minimize: {}".format(dt.datetime.now()),file=outf)
