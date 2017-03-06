@@ -453,5 +453,5 @@ for n_hidden in hidden_vals:
             # find the accuracy on Validation Dataset
             
             print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
-            print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%',outf)
+            print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%',file=outf)
             print("----------\n\n\n".format(lamdaval,n_hidden))
