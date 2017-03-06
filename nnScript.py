@@ -5,61 +5,22 @@ from math import sqrt
 
 
 def initializeWeights(n_in, n_out):
-    """
-    # initializeWeights return the random weights for Neural Network given the
-    # number of node in the input layer and output layer
-
-    # Input:
-    # n_in: number of nodes of the input layer
-    # n_out: number of nodes of the output layer
-       
-    # Output: 
-    # W: matrix of random initial weights with size (n_out x (n_in + 1))"""
-
     epsilon = sqrt(6) / sqrt(n_in + n_out + 1)
     W = (np.random.rand(n_out, n_in + 1) * 2 * epsilon) - epsilon
     return W
 
 
 def sigmoid(z):
-    """# Notice that z can be a scalar, a vector or a matrix
-    # return the sigmoid of input z"""
-
     return  1 / (1 + np.exp(-z))
     
-def deriv_sigmoid(z):
-    """# Notice that z can be a scalar, a vector or a matrix
-    # return the sigmoid of input z"""
-
-    return  sigmoid(z) * (1 - sigmoid(z))
+def my_preprocess() :
+    mat = loadmat('SmallFile.mat')
+    
 
 
 def preprocess():
-    """ Input:
-     Although this function doesn't have any input, you are required to load
-     the MNIST data set from file 'mnist_all.mat'.
-
-     Output:
-     train_data: matrix of training set. Each row of train_data contains 
-       feature vector of a image
-     train_label: vector of label corresponding to each image in the training
-       set
-     validation_data: matrix of training set. Each row of validation_data 
-       contains feature vector of a image
-     validation_label: vector of label corresponding to each image in the 
-       training set
-     test_data: matrix of training set. Each row of test_data contains 
-       feature vector of a image
-     test_label: vector of label corresponding to each image in the testing
-       set
-
-     Some suggestions for preprocessing step:
-     - feature selection"""
-
     mat = loadmat('mnist_all.mat')  # loads the MAT object as a Dictionary
-
     # Pick a reasonable size for validation data
-
     # ------------Initialize preprocess arrays----------------------#
     train_preprocess = np.zeros(shape=(50000, 784))
     validation_preprocess = np.zeros(shape=(10000, 784))
@@ -130,35 +91,49 @@ def preprocess():
 
     # Feature selection
     # Your code here.
-    
-
-
     #this is reducing it to colunms vs 50k*784 values. 
     bool_index =  np.all(train_preprocess == train_preprocess[0,:] , axis = 0) #this will give me bool values for indexes that are equal in value for that columbs
     
     index_zeros = np.where(~train_preprocess.any(axis=0))[0] # this will give me indexes of all the colums with 0.
     index_Ignored_Columns = np.where(np.all(train_preprocess == train_preprocess[0,:] , axis = 0))
+    print (index_zeros)
 
-    train_data = train_data[:,bool_index]
+    print (index_Ignored_Columns)
+
+
+    train_data = train_data[:,bool_index == False]
     train_data = train_data / 255.0
 
-    validation_data = validation_data[:,bool_index]
+    validation_data = validation_data[:,bool_index == False]
     validation_data = validation_data / 255.0
 
-    test_data = test_data[:,bool_index]
+    test_data = test_data[:,bool_index == False]
     test_data = test_data / 255.0
     
     print('preprocess done')
+    return train_data, train_label, validation_data, validation_label, test_data, test_label 
 
-    return train_data, train_label, validation_data, validation_label, test_data, test_label, index_zeros, index_Ignored_Columns 
-
+def ErrorFcn(w1, w2, o, training_label, n_class, n_input):
+    y = np.zeros(n_input, n_class);
+    for i in range(n_input):
+        y[i,training_label[i]] = 1
+    
+    A = np.log(o)
+    B = np.log(1-o)
+    
+    error_sum =  -(1/n_input) * np.sum((np.multiply(y,A)) ,(np.multiply((1-y),B)))
+    return error_sum
+    
+def reg_ErrorFcn(w1, w2, o, training_label, n_class, n_input, lamda):
+    no_reg = ErrorFcn(w1, w2, o, training_label, n_class, n_input)
+    reg_part = lamda/(2*n_input) * (np.square(w1).sum() + np.square(w2).sum())
+    return no_reg + reg_part
 
 def nnObjFunction(params, *args):
     """% nnObjFunction computes the value of objective function (negative log 
     %   likelihood error function with regularization) given the parameters 
     %   of Neural Networks, thetraining data, their corresponding training 
     %   labels and lambda - regularization hyper-parameter.
-
     % Input:
     % params: vector of weights of 2 matrices w1 (weights of connections from
     %     input layer to hidden layer) and w2 (weights of connections from
@@ -181,7 +156,6 @@ def nnObjFunction(params, *args):
     % NOTE: how to compute obj_grad
     % Use backpropagation algorithm to compute the gradient of error function
     % for each weights in weight matrices.
-
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % reshape 'params' vector into 2 matrices of weight w1 and w2
     % w1: matrix of weights of connections from input layer to hidden layers.
@@ -199,11 +173,6 @@ def nnObjFunction(params, *args):
     
 
     # Your code here
-    #
-    #
-    #
-    #
-    #
     training_data_y, training_data_x = training_data.shape
     in_data = np.c_[train_data, np.ones(training_data_y)]
 
@@ -219,7 +188,6 @@ def nnObjFunction(params, *args):
 def nnPredict(w1, w2, data):
     """% nnPredict predicts the label of data given the parameter w1, w2 of Neural
     % Network.
-
     % Input:
     % w1: matrix of weights of connections from input layer to hidden layers.
     %     w1(i, j) represents the weight of connection from unit i in input 
@@ -231,50 +199,63 @@ def nnPredict(w1, w2, data):
     %       vector of a particular image
        
     % Output: 
-    % label: a column vector of predicted labels"""
-    
+    % label: a column vector of predicted labels""" 
     # Your code here
-    _, sig_output = nnFeedForward(w1,w2,data)    
-    labels = np.argmax(sig_output, axis=1)
-
+    _, sig_output , labels = nnFeedForward(w1,w2,data)    
+    #labels = np.argmax(sig_output, axis=1)
+    
     return labels
     
 def nnFeedForward(w1,w2,data):
-    """% nnFeedForward calculatesd the values in each layer of the neural network
-
-    % Input:
-    % w1: matrix of weights of connections from input layer to hidden layers.
-    %     w1(i, j) represents the weight of connection from unit i in input 
-    %     layer to unit j in hidden layer.
-    % w2: matrix of weights of connections from hidden layer to output layers.
-    %     w2(i, j) represents the weight of connection from unit i in input 
-    %     layer to unit j in hidden layer.
-    % data: matrix of data. Each row of this matrix represents the feature 
-    %       vector of a particular image
-       
-    % Output: 
-    % sig_hidden: a matrix of hidden layer values
-    % sig_output: a matrix of output layer values """
     w1 = np.transpose(w1)
     w2 = np.transpose(w2)
-    
+    print ("This is the W1 matrix")
+    print (w1)
+    print (" ")
+    print ("This is the W2 matrix")
+    print (w2)
+    print (np.equal.reduce(w2))
+    print (" ")
+    print ("This is the data set :")
+    print (data)
+    print (np.equal.reduce(data))
+    print (" ")
     data_y, data_x = data.shape
-    in_data = np.c_[data, np.ones(data_y)]
     
+    in_data = np.c_[data, np.ones(data_y)]
+    print ("This is data after adding bias")
+    print (in_data)
+    print (np.equal.reduce(in_data , axis = 0))
+    print (" ")
     hidden_layer = np.dot(in_data, w1)
+    print ("This is the hidden_layer")
+    print (np.equal.reduce(hidden_layer))
+    print (" ")
     sig_hidden = sigmoid(hidden_layer)
+    print ("This is the sig_hidden")
+    print (sig_hidden)
+    print (" ")
     sig_hidden_y, sig_hidden_x = hidden_layer.shape
     sig_hidden = np.c_[sig_hidden, np.ones(sig_hidden_y)]
     
     output = np.dot(sig_hidden,w2)
+    print ("this is the output")
+    print (output)
+    print (" ")
     sig_output = sigmoid(output)
-    
-    return sig_hidden[:,:-1], sig_output[:,:]
+    print ("this is the sig output")
+    print (sig_output)
+    print (" ")
+    labels = np.argmax(sig_output, axis=1)
+    print ("This is the label")
+    print (labels)
+    return sig_hidden[:,:-1], sig_output[:,:] , labels
+
 
 
 """**************Neural Network Script Starts here********************************"""
 
-train_data, train_label, validation_data, validation_label, test_data, test_label , index_zeros, index_Ignored_Columns = preprocess()
+train_data, train_label, validation_data, validation_label, test_data, test_label = preprocess()
 
 #  Train Neural Network
 
