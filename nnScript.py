@@ -163,20 +163,11 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
     global truth_matrix
     y = truth_matrix
     
-    '''REMOVE THIS'''
-#==============================================================================
-#     global training_label
-#     y = np.zeros((2,2))
-#     for i in range(2):
-#         y[i,training_label[i]] = 1
-#==============================================================================
 
     sigma = o-y
     #print('sigma:\n{}'.format(sigma))
     num_images, num_features = data.shape
     grad_w2 = np.zeros(( n_class, n_hidden+1, num_images))
-    
-    #This loop is 3 deep, but adds an inconsequential amount of time
 
     
     
@@ -200,10 +191,7 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
     grad_w1 = np.zeros((n_input+1, n_hidden, num_images))
     w2t = np.transpose(w2)
     #This loop adds a prohibitive amount of time
-    for image in range(num_images):
-        #if image%10000==0 and not image == 0:
-            #print("\t\t--{} images done grad_w1 at = {}".format(image,dt.datetime.now()))
-            
+    for image in range(num_images):            
         for h_node in range(n_hidden):
             pre = (1-z[image,h_node])*z[image,h_node] * np.sum(np.multiply(sigma[image], w2t[ h_node]) )
             for pixel in range(n_input+1):
