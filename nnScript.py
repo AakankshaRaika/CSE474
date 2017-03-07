@@ -7,7 +7,7 @@ import datetime as dt
 
 import pickle
 
-truth_matrix = np.zeros((50000, 10))
+
 global index_selected_columns
 index_selected_columns = np.zeros((1))
 
@@ -120,7 +120,7 @@ def preprocess():
     
     
     global truth_matrix
-
+    truth_matrix = np.zeros((50000, 10))
     for i in range(50000):
         truth_matrix[i,int(train_label[i])] = 1
     
@@ -223,10 +223,12 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
 
     '''uses einstein summation, super convineient'''
     pre = np.multiply(np.multiply((1-z), z), np.dot(sigma, w2[:,:-1]))
+
+    
 #    grad_w1 = np.einsum('ih,ip->phi',pre,data)
 #    del pre
 
-    global grad_w1
+    #global grad_w1
     grad_w1 = np.dot(np.transpose(data),pre)
 
 #    for image in range(num_images):
@@ -239,7 +241,8 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
     #reg_grad_w1 = np.transpose(grad_w1.sum(axis=2))
     reg_grad_w1 = np.transpose(grad_w1) + lamda * w1
     reg_grad_w1 = reg_grad_w1/num_images
-    
+
+
     return reg_grad_w1, reg_grad_w2
 
 def nnObjFunction(params, *args):
@@ -383,13 +386,10 @@ def nnFeedForward(w1,w2,data):
 
 """**************Neural Network Script Starts here********************************"""
 
-
-
-# set the number of nodes in hidden unit (not including bias unit)
-hidden_vals = [ 10, 20,30, 40, 50, 60, 70, 80, 90, 100, 150, 200]
-for n_hidden in hidden_vals:
-    for lamdaval in range(0,81,10):
-
+def process_vals(n_hidden, lamdaval):
+    
+        #lamdaval = 50
+        
         train_data, train_label, validation_data, validation_label, test_data, test_label = preprocess()
 
             #  Train Neural Network
@@ -420,7 +420,7 @@ for n_hidden in hidden_vals:
             
             opts = {'maxiter': 50}  # Preferred value.
             #global numIters
-            numIters = 0
+            #numIters = 0
             print("\n\n\ntest: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden))
             print("test: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden),file=outf)
             print("Begun minimize: {}".format(dt.datetime.now()))
@@ -445,7 +445,7 @@ for n_hidden in hidden_vals:
             obj = [index_selected_columns, n_hidden, w1, w2, lamdaval]
 
             #Dump the data
-            pickle.dump(obj, open("zztest_lamda{}___hidden{}.pickle".format(lamdaval,n_hidden), 'wb'))
+            #pickle.dump(obj, open("zztest_lamda{}___hidden{}.pickle".format(lamdaval,n_hidden), 'wb'))
             
             
             # find the accuracy on Training Dataset
@@ -465,3 +465,15 @@ for n_hidden in hidden_vals:
             print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
             print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%',file=outf)
             print("----------\n\n\n".format(lamdaval,n_hidden))
+            
+            return
+
+# set the number of nodes in hidden unit (not including bias unit)
+
+for n_hidden in range(100,0,-10):
+   for lamdaval in range(0,81,10):
+       
+       process_vals(n_hidden, lamdaval)
+       del truth_matrix
+       del index_selected_columns
+       
