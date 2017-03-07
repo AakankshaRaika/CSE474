@@ -131,7 +131,7 @@ def preprocess():
 
 def ErrorFcn(w1, w2, o, n_class, n_input):
     global truth_matrix
-    y = truth_matrix
+   #y = truth_matrix
     
     '''REMOVE THIS'''
 #==============================================================================
@@ -142,13 +142,13 @@ def ErrorFcn(w1, w2, o, n_class, n_input):
 #     print(y)
 #==============================================================================
     
-    A = np.log(o)
-    B = np.log(1-o)
+#    A = np.log(o)
+#    B = np.log(1-o)
 
-    pre = (np.multiply(y,A))
-    post = (np.multiply((1-y),B))
+    pre = (np.multiply(truth_matrix,np.log(o)))
+    post = (np.multiply((1-truth_matrix),np.log(1-o)))
     
-    error_sum =  -(1/50000) * np.sum((np.multiply(y, pre) + np.multiply(1-y,post)))
+    error_sum =  -(1/50000) * np.sum((np.multiply(truth_matrix, pre) + np.multiply(1-truth_matrix,post)))
 
     return error_sum
     
@@ -161,7 +161,7 @@ def reg_ErrorFcn(w1, w2, o, n_class, n_input, lamda):
 def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
     
     global truth_matrix
-    y = truth_matrix
+    #y = truth_matrix
     
     '''REMOVE THIS'''
 #==============================================================================
@@ -170,7 +170,7 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
 #     for i in range(2):
 #         y[i,training_label[i]] = 1
 
-    sigma = o-y
+    sigma = o-truth_matrix
     
     #print('sigma:\n{}'.format(sigma))
     num_images, num_features = data.shape
@@ -180,9 +180,13 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
    
     z_y, z_x = z.shape
     z_mod = np.c_[z, np.ones(z_y)]
+                  
+    grad_w2
+    grad_w2 = np.transpose(np.dot(np.transpose(z_mod),sigma))
     
     '''uses einstein summation, super convineient'''
-    grad_w2 = np.einsum('io,ih->ohi',sigma,z_mod)
+#    grad_w2 = np.einsum('io,ih->ohi',sigma,z_mod)
+#    del z_mod
     
 #    for image in range(num_images):
 #        for h_node in range(n_hidden+1):
@@ -192,15 +196,16 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
 #                else: 
 #                    grad_w2[ o_node, h_node, image] = sigma[image, o_node] 
 
-    reg_grad_w2 = grad_w2.sum(axis=2)
-    reg_grad_w2 = reg_grad_w2 + lamda*w2
+    #reg_grad_w2 = grad_w2.sum(axis=2)
+   
+    reg_grad_w2 = grad_w2 + lamda*w2
     reg_grad_w2 = reg_grad_w2/num_images
     
     data_y, data_x = data.shape
     data = np.c_[data, np.ones(data_y)]
                     
                     
-    grad_w1 = np.zeros((n_input+1, n_hidden, num_images))
+    #grad_w1 = np.zeros((n_input+1, n_hidden, num_images))
 #    w2t = np.transpose(w2)
 #    
 #    global z_v
@@ -218,8 +223,11 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
 
     '''uses einstein summation, super convineient'''
     pre = np.multiply(np.multiply((1-z), z), np.dot(sigma, w2[:,:-1]))
-    grad_w1 = np.einsum('ih,ip->phi',pre,data)
-    
+#    grad_w1 = np.einsum('ih,ip->phi',pre,data)
+#    del pre
+
+    global grad_w1
+    grad_w1 = np.dot(np.transpose(data),pre)
 
 #    for image in range(num_images):
 #        for h_node in range(n_hidden):
@@ -228,8 +236,8 @@ def gradFcn(w1, w2, z, o, n_input, n_hidden, n_class, lamda, data):
 #                grad_w1[pixel, h_node, image] = pre[image,h_node] * data[image,pixel] 
 
                         
-    reg_grad_w1 = np.transpose(grad_w1.sum(axis=2))
-    reg_grad_w1 = reg_grad_w1 + lamda * w1
+    #reg_grad_w1 = np.transpose(grad_w1.sum(axis=2))
+    reg_grad_w1 = np.transpose(grad_w1) + lamda * w1
     reg_grad_w1 = reg_grad_w1/num_images
     
     return reg_grad_w1, reg_grad_w2
@@ -292,10 +300,10 @@ def nnObjFunction(params, *args):
     # you would use code similar to the one below to create a flat array
     obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
 
-    global numIters
-    numIters+=1
-    if numIters %10==0:
-        print("\t--The obj fn has been called {} times. (t:{}) \t\tObjective: {}".format(numIters,dt.datetime.now(),obj_val))
+    #global numIters
+    #numIters+=1
+    #if numIters %10==0:
+        #print("\t--The obj fn has been called {} times. (t:{}) \t\tObjective: {}".format(numIters,dt.datetime.now(),obj_val))
     return obj_val, obj_grad
 
 
@@ -375,17 +383,19 @@ def nnFeedForward(w1,w2,data):
 
 """**************Neural Network Script Starts here********************************"""
 
-train_data, train_label, validation_data, validation_label, test_data, test_label = preprocess()
 
-#  Train Neural Network
-
-# set the number of nodes in input unit (not including bias unit)
-n_input = train_data.shape[1]
 
 # set the number of nodes in hidden unit (not including bias unit)
-hidden_vals = [10, 50, 100, 200]
+hidden_vals = [ 10, 20,30, 40, 50, 60, 70, 80, 90, 100, 150, 200]
 for n_hidden in hidden_vals:
     for lamdaval in range(0,81,10):
+
+        train_data, train_label, validation_data, validation_label, test_data, test_label = preprocess()
+
+            #  Train Neural Network
+
+        # set the number of nodes in input unit (not including bias unit)
+        n_input = train_data.shape[1]
 
         # set the number of nodes in output unit
         n_class = 10
@@ -400,7 +410,7 @@ for n_hidden in hidden_vals:
         # set the regularization hyper-parameter
         
         
-        with open("test_lamda{}___hidden{}.txt".format(lamdaval,n_hidden), "w") as outf:
+        with open("aa__test_lamda{}___hidden{}.txt".format(lamdaval,n_hidden), "w") as outf:
                     
                    
                    
@@ -409,7 +419,7 @@ for n_hidden in hidden_vals:
             # Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
             
             opts = {'maxiter': 50}  # Preferred value.
-            global numIters
+            #global numIters
             numIters = 0
             print("\n\n\ntest: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden))
             print("test: lamda{}\t\thidden{}\n".format(lamdaval,n_hidden),file=outf)
@@ -435,7 +445,7 @@ for n_hidden in hidden_vals:
             obj = [index_selected_columns, n_hidden, w1, w2, lamdaval]
 
             #Dump the data
-            pickle.dump(obj, open("test_lamda{}___hidden{}.pickle".format(lamdaval,n_hidden), 'wb'))
+            pickle.dump(obj, open("zztest_lamda{}___hidden{}.pickle".format(lamdaval,n_hidden), 'wb'))
             
             
             # find the accuracy on Training Dataset
@@ -455,4 +465,3 @@ for n_hidden in hidden_vals:
             print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
             print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%',file=outf)
             print("----------\n\n\n".format(lamdaval,n_hidden))
-x
