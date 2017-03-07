@@ -100,7 +100,7 @@ def preprocess():
     index_zeros = np.where(~train_preprocess.any(axis=0))[0] # this will give me indexes of all the colums with 0.
     index_Ignored_Columns = np.where(np.all(train_preprocess == train_preprocess[0,:] , axis = 0))
     global index_selected_columns
-    index_selected_columns = np.where(np.all(train_preprocess != train_preprocess[0,:] , axis = 0))
+    index_selected_columns = np.where(bool_index == False)
     print(index_selected_columns)
 #==============================================================================
 #     print (index_zeros)
