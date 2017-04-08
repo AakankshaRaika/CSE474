@@ -56,6 +56,8 @@ def qdaTest(means,covmats,Xtest,ytest):
     # IMPLEMENT THIS METHOD
     return acc,ypred
 
+
+#Aakanksha : 
 def learnOLERegression(X,y):
     # Inputs:                                                         
     # X = N x d 
@@ -77,6 +79,7 @@ def learnRidgeRegression(X,y,lambd):
     # IMPLEMENT THIS METHOD                                                   
     return w
 
+#Aakanksha :
 def testOLERegression(w,Xtest,ytest):
     # Inputs:
     # w = d x 1
@@ -97,6 +100,7 @@ def regressionObjVal(w, X, y, lambd):
     # IMPLEMENT THIS METHOD                                             
     return error, error_grad
 
+#Aakanksha :
 def mapNonLinear(x,p):
     # Inputs:                                                                  
     # x - a single column vector (N x 1)                                       
