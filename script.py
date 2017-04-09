@@ -56,17 +56,19 @@ def qdaTest(means,covmats,Xtest,ytest):
     # IMPLEMENT THIS METHOD
     return acc,ypred
 
-
-#Aakanksha : 
+#Aakanksha :
 def learnOLERegression(X,y):
     # Inputs:                                                         
     # X = N x d 
     # y = N x 1                                                               
     # Output: 
     # w = d x 1 
-	
-    # IMPLEMENT THIS METHOD                                                   
-    return w
+    # IMPLEMENT THIS METHOD
+    transposed_x = np.transpose(x)     #Permute the dimensions of an array
+    inverse = np.dot(transposed_x , x) #inverts the matrix
+    dot_y = np.do(transposed_x , y)    #multiplies y with dimension of x
+    w = np.dot(inverse, dot_y)         #multiplies dot_y and inverse of x
+    return w                           #returns the weight 
 
 def learnRidgeRegression(X,y,lambd):
     # Inputs:
@@ -79,7 +81,7 @@ def learnRidgeRegression(X,y,lambd):
     # IMPLEMENT THIS METHOD                                                   
     return w
 
-#Aakanksha :
+#Aakanksha
 def testOLERegression(w,Xtest,ytest):
     # Inputs:
     # w = d x 1
@@ -87,9 +89,12 @@ def testOLERegression(w,Xtest,ytest):
     # ytest = X x 1
     # Output:
     # mse
-    
     # IMPLEMENT THIS METHOD
-    return mse
+    sqDif = np.square(np.subtract(ytest,np.dot(Xtest,w))) #subtracts the dot product of the w and the x from y and squares it
+    rmse = np.sum(sqDif)                                  #performs a summition 
+    N = Xtest.shape[0]                                    #gets the sphape of xtest so that we can get N 
+    mse = np.divide(rmse,N)                               #divides the summition by N
+    return mse                                            #returns mse
 
 def regressionObjVal(w, X, y, lambd):
 
@@ -100,7 +105,7 @@ def regressionObjVal(w, X, y, lambd):
     # IMPLEMENT THIS METHOD                                             
     return error, error_grad
 
-#Aakanksha :
+# Aakanksha :
 def mapNonLinear(x,p):
     # Inputs:                                                                  
     # x - a single column vector (N x 1)                                       
