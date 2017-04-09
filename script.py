@@ -85,7 +85,8 @@ def testOLERegression(w,Xtest,ytest):
 
     # IMPLEMENT THIS METHOD
     #literal converstion from the formula given
-    sub = np.subtract(ytest,np.dot(Xtest,w))
+    xw = np.dot(Xtest,w)
+    sub = np.subtract(ytest,xw)
     sqDif = np.square(sub)                                #subtracts the dot product of the w and the x from $
     rmse = np.sum(sqDif)                                  #performs a summition
     N = Xtest.shape[0]                                    #gets the sphape of xtest so that we can get N
