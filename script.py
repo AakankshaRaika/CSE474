@@ -56,7 +56,7 @@ def qdaTest(means,covmats,Xtest,ytest):
     # IMPLEMENT THIS METHOD
     return acc,ypred
 
-#aakanksha
+#Problem 2 
 def learnOLERegression(X,y):
     # Inputs:
     # X = N x d
@@ -74,7 +74,7 @@ def learnOLERegression(X,y):
     w = np.dot(inverse, dot_y)                           #calculating the wight
     return w
 
-#aakanksha
+#Problem 2
 def testOLERegression(w,Xtest,ytest):
     # Inputs:
     # w = d x 1
@@ -115,7 +115,7 @@ def regressionObjVal(w, X, y, lambd):
     # IMPLEMENT THIS METHOD                                             
     return error, error_grad
 
-# Aakanksha :
+# Aakanksha : Problem 5
 def mapNonLinear(x,p):
     # Inputs:                                                                  
     # x - a single column vector (N x 1)                                       
