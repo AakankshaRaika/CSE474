@@ -124,6 +124,11 @@ def mapNonLinear(x,p):
     # Xd - (N x (d+1)) 
 	
     # IMPLEMENT THIS METHOD
+    shape = x.shape[0]               # gets the shape of x
+    N = p+1                          # N = p + 1
+    Xd = np.ones((shape,N))          # matrix Xd = (shape of x ) x N
+    for i in range(1, N):            # looping to assign through out the
+        Xd[:, i] = math.pow(x,i)     # assign x^i to the array xd we are making it linear
     return Xd
 
 # Main script
