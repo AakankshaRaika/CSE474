@@ -43,7 +43,7 @@ def ldaLearn(X,y):
     means =  [[],[],[],[],[]]
     for classification in range(max_class-min_class+1):
         means[classification] = np.mean(X_split[classification],axis=0)
-    covmat = np.cov(X.T)
+    covmat = np.cov(X.T,bias=1)
     return means,covmat
 
 def qdaLearn(X,y):
@@ -61,7 +61,7 @@ def qdaLearn(X,y):
     covmats = [[],[],[],[],[]]
     for classification in range(max_class-min_class+1):
         means[classification] = np.mean(X_split[classification],axis=0)
-        covmats[classification] =  np.cov(X_split[classification].T)
+        covmats[classification] =  np.cov(X_split[classification].T,bias=1)
 
     return means,covmats
 
@@ -76,7 +76,7 @@ def ldaTest(means,covmat,Xtest,ytest):
 
     # IMPLEMENT THIS METHOD
     
-
+    
     acc, ypred = qdaTest(means,[covmat,covmat,covmat,covmat,covmat],Xtest,ytest)
 
     return acc,ypred
@@ -101,29 +101,25 @@ def qdaTest(means,covmats,Xtest,ytest):
             factor = 1/np.sqrt(np.linalg.norm(covmats[category]))
             
             mean_diffs = Xtest[sample] - means[category]
-            mahalanobis = mean_diffs.T.dot(covmats[category]).dot(mean_diffs)
-            global aaa
-            aaa = factor * np.exp(-1*mahalanobis)
+            mahalanobis = mean_diffs.T.dot(np.linalg.inv(covmats[category]).dot(mean_diffs))
+
             scores[category].append( factor * np.exp(-1*mahalanobis) )
         
     ypred = []
-    global s
-    s = scores
     for sample in range(len(ytest)):
-        sample_scores = [scores[0][sample], scores[1][sample], scores[2][sample], scores[3][sample], scores[4][sample]]
+        sample_scores = [scores[0][sample], scores[1][sample],
+                         scores[2][sample], scores[3][sample],
+                         scores[4][sample]]    
         predict = int(sample_scores.index(max(sample_scores))) + 1
         ypred.append(predict)
 
     ypred = np.asarray([ypred])
     num_correct = np.sum(ypred.T == ytest)
-    global aaa_pred
-    global aaa_actu
-    aaa_pred = ypred
-    aaa_actu = ytest
     
     acc = num_correct / len(ytest)
  
     return acc,ypred
+
 
 #Problem 2 
 def learnOLERegression(X,y):
