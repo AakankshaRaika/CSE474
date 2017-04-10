@@ -8,6 +8,26 @@ import matplotlib.pyplot as plt
 import pickle
 import sys
 
+def splitArray(X,y):
+    # Inputs
+    # X - a N x d matrix with each row corresponding to a training example
+    # y - a N x 1 column vector indicating the labels for each training example
+    # Outputs
+    # X_list - A list of 5 d x k matrices contaiing training values split by the associated y value
+    # min_class - minimum class valule -- assumed integer
+    # max_class - maximum class value -- assumed integer
+    
+    samples, features = np.shape(X)
+    max_class = int(np.amax(y))
+    min_class = int(np.amin(y))
+    y = np.concatenate((y,y),axis=1)
+    X_list = [[],[],[],[],[]]
+    for classification in range(0, max_class-min_class+1):
+        X_list[classification] = ( X[ np.where(y == classification + min_class)] ).reshape((-1, features))
+    
+    return X_list, min_class, max_class
+
+
 def ldaLearn(X,y):
     # Inputs
     # X - a N x d matrix with each row corresponding to a training example
@@ -18,6 +38,12 @@ def ldaLearn(X,y):
     # covmat - A single d x d learnt covariance matrix 
     
     # IMPLEMENT THIS METHOD 
+    X_split, min_class, max_class = splitArray(X,y)
+    
+    means =  [[],[],[],[],[]]
+    for classification in range(max_class-min_class+1):
+        means[classification] = np.mean(X_split[classification],axis=0)
+    covmat = np.cov(X.T)
     return means,covmat
 
 def qdaLearn(X,y):
@@ -30,6 +56,13 @@ def qdaLearn(X,y):
     # covmats - A list of k d x d learnt covariance matrices for each of the k classes
     
     # IMPLEMENT THIS METHOD
+    X_split, min_class, max_class = splitArray(X,y)
+    means =  [[],[],[],[],[]]
+    covmats = [[],[],[],[],[]]
+    for classification in range(max_class-min_class+1):
+        means[classification] = np.mean(X_split[classification],axis=0)
+        covmats[classification] =  np.cov(X_split[classification].T)
+
     return means,covmats
 
 def ldaTest(means,covmat,Xtest,ytest):
@@ -42,6 +75,10 @@ def ldaTest(means,covmat,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
+    
+
+    acc, ypred = qdaTest(means,[covmat,covmat,covmat,covmat,covmat],Xtest,ytest)
+
     return acc,ypred
 
 def qdaTest(means,covmats,Xtest,ytest):
@@ -54,6 +91,38 @@ def qdaTest(means,covmats,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
+    
+    ypred = []
+    scores = [[],[],[],[],[]]
+    
+
+    for category in range(5):
+        for sample in range(len(ytest)):
+            factor = 1/np.sqrt(np.linalg.norm(covmats[category]))
+            
+            mean_diffs = Xtest[sample] - means[category]
+            mahalanobis = mean_diffs.T.dot(covmats[category]).dot(mean_diffs)
+            global aaa
+            aaa = factor * np.exp(-1*mahalanobis)
+            scores[category].append( factor * np.exp(-1*mahalanobis) )
+        
+    ypred = []
+    global s
+    s = scores
+    for sample in range(len(ytest)):
+        sample_scores = [scores[0][sample], scores[1][sample], scores[2][sample], scores[3][sample], scores[4][sample]]
+        predict = int(sample_scores.index(max(sample_scores))) + 1
+        ypred.append(predict)
+
+    ypred = np.asarray([ypred])
+    num_correct = np.sum(ypred.T == ytest)
+    global aaa_pred
+    global aaa_actu
+    aaa_pred = ypred
+    aaa_actu = ytest
+    
+    acc = num_correct / len(ytest)
+ 
     return acc,ypred
 
 #Problem 2 
