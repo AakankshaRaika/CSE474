@@ -167,7 +167,17 @@ def learnRidgeRegression(X,y,lambd):
     # Output:                                                                  
     # w = d x 1                                                                
 
-    # IMPLEMENT THIS METHOD                                                   
+    # IMPLEMENT THIS METHOD    
+    # https://onlinecourses.science.psu.edu/stat857/node/155
+    
+    N, d = np.shape(X)
+    
+    XT_dot_X = np.dot(X.T,X)
+    lambd_eye = lambd*np.eye(d)
+    sum_X_I_inv = np.linalg.inv( XT_dot_X + lambd_eye )
+    XT_dot_y = np.dot(X.T, y)
+    w = np.dot(sum_X_I_inv, XT_dot_y)
+	
     return w
 
 
