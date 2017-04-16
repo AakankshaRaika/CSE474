@@ -339,7 +339,7 @@ plt.show()
 
 # Problem 5
 pmax = 7
-lambda_opt = min_lambda # REPLACE THIS WITH lambda_opt estimated from Problem 3
+lambda_opt = lambdas[np.argmin(mses4)] 
 mses5_train = np.zeros((pmax,2))
 mses5 = np.zeros((pmax,2))
 for p in range(pmax):
