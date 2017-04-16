@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import pickle
 import sys
 
+# Andrew
 def splitArray(X,y):
     # Inputs
     # X - a N x d matrix with each row corresponding to a training example
@@ -28,6 +29,7 @@ def splitArray(X,y):
     return X_list, min_class, max_class
 
 
+# Andrew
 def ldaLearn(X,y):
     # Inputs
     # X - a N x d matrix with each row corresponding to a training example
@@ -46,6 +48,7 @@ def ldaLearn(X,y):
     covmat = np.cov(X.T,bias=1)
     return means,covmat
 
+# Andrew
 def qdaLearn(X,y):
     # Inputs
     # X - a N x d matrix with each row corresponding to a training example
@@ -65,6 +68,7 @@ def qdaLearn(X,y):
 
     return means,covmats
 
+# Andrew
 def ldaTest(means,covmat,Xtest,ytest):
     # Inputs
     # means, covmat - parameters of the LDA model
@@ -81,6 +85,7 @@ def ldaTest(means,covmat,Xtest,ytest):
 
     return acc,ypred
 
+# Andrew
 def qdaTest(means,covmats,Xtest,ytest):
     # Inputs
     # means, covmats - parameters of the QDA model
@@ -121,7 +126,7 @@ def qdaTest(means,covmats,Xtest,ytest):
     return acc,ypred
 
 
-#Problem 2 
+# Aakanksha : Problem 2 
 def learnOLERegression(X,y):
     # Inputs:
     # X = N x d
@@ -139,7 +144,7 @@ def learnOLERegression(X,y):
     w = np.dot(inverse, dot_y)                           #calculating the wight
     return w
 
-#Problem 2
+#Aakanksha : Problem 2
 def testOLERegression(w,Xtest,ytest):
     # Inputs:
     # w = d x 1
@@ -158,7 +163,7 @@ def testOLERegression(w,Xtest,ytest):
     mse = np.divide(rmse,N)
     return mse
 
-
+# Andrew
 def learnRidgeRegression(X,y,lambd):
     # Inputs:
     # X = N x d                                                               
@@ -180,6 +185,7 @@ def learnRidgeRegression(X,y,lambd):
 	
     return w
 
+# Dom : Problem 4
 def regressionObjVal(w, X, y, lambd):
     
     # compute squared error (scalar) and gradient of squared error with respect
