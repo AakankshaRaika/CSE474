@@ -1,5 +1,4 @@
 import numpy as np
-import math as math
 from scipy.optimize import minimize
 from scipy.io import loadmat
 from numpy.linalg import det, inv
@@ -198,9 +197,10 @@ def regressionObjVal(w, X, y, lambd):
     N = X.shape[0]
     w = np.mat(w).T
     
-    error = (((y - X.dot(w)).T).dot((y - X.dot(w))) / (2*N)) + ((lambd * ((w.T).dot(w))) / 2)
+    #error = (((y - X.dot(w)).T).dot((y - X.dot(w))) / (2*N)) + ((lambd * ((w.T).dot(w))) / 2)
+    error = (((y - X.dot(w)).T).dot((y - X.dot(w)))) + ((lambd * ((w.T).dot(w))) / 2)
     #error_grad = (((((w.T).dot((X.T).dot(X))) - ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
-    error_grad = (((-1((w.T).dot((X.T).dot(X))) + ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
+    error_grad = (((((w.T).dot((X.T).dot(X))) + ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
     error_grad = np.ndarray.flatten(np.array(error_grad))
     return error, error_grad
 
