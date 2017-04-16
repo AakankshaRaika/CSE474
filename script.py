@@ -1,4 +1,5 @@
 import numpy as np
+import math as math
 from scipy.optimize import minimize
 from scipy.io import loadmat
 from numpy.linalg import det, inv
