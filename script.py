@@ -255,9 +255,11 @@ Xtest_i = np.concatenate((np.ones((Xtest.shape[0],1)), Xtest), axis=1)
 
 w = learnOLERegression(X,y)
 mle = testOLERegression(w,Xtest,ytest)
+print("MSE without intercept mean of magnitude of weights: {}".format(np.mean(np.absolute(w))))
 
 w_i = learnOLERegression(X_i,y)
 mle_i = testOLERegression(w_i,Xtest_i,ytest)
+print("MSE with intercept mean of magnitude of weights: {}".format(np.mean(np.absolute(w_i))))
 
 print('MSE without intercept '+str(mle))
 print('MSE with intercept '+str(mle_i))
@@ -268,10 +270,12 @@ lambdas = np.linspace(0, 1, num=k)
 i = 0
 mses3_train = np.zeros((k,1))
 mses3 = np.zeros((k,1))
+w_l_list = []
 for lambd in lambdas:
     w_l = learnRidgeRegression(X_i,y,lambd)
     mses3_train[i] = testOLERegression(w_l,X_i,y)
     mses3[i] = testOLERegression(w_l,Xtest_i,ytest)
+    w_l_list.append(w_l)
     i = i + 1
 fig = plt.figure(figsize=[12,6])
 plt.subplot(1, 2, 1)
@@ -282,6 +286,13 @@ plt.plot(lambdas,mses3)
 plt.title('MSE for Test Data')
 
 plt.show()
+
+w_l = w_l_list[np.argmin(mses3)]
+print("Ridge Regresion, mean of magnitude of weights: {}".format(np.mean(np.absolute(w_i))))
+
+min_lambda = lambdas[np.argmin(mses3)]
+print("The minimum MSE for Test Data occurs at lambda: {} with an MSE of {}".format(min_lambda, float(mses3[np.argmin(mses3)])))
+
 # Problem 4
 k = 101
 lambdas = np.linspace(0, 1, num=k)
@@ -315,7 +326,7 @@ plt.show()
 
 # Problem 5
 pmax = 7
-lambda_opt = 0 # REPLACE THIS WITH lambda_opt estimated from Problem 3
+lambda_opt = min_lambda # REPLACE THIS WITH lambda_opt estimated from Problem 3
 mses5_train = np.zeros((pmax,2))
 mses5 = np.zeros((pmax,2))
 for p in range(pmax):
