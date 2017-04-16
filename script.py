@@ -180,14 +180,21 @@ def learnRidgeRegression(X,y,lambd):
 	
     return w
 
-
 def regressionObjVal(w, X, y, lambd):
-
+    
     # compute squared error (scalar) and gradient of squared error with respect
     # to w (vector) for the given data X and y and the regularization parameter
-    # lambda                                                                  
-
-    # IMPLEMENT THIS METHOD                                             
+    # lambda
+    
+    # IMPLEMENT THIS METHOD
+    #https://www.cs.utah.edu/~piyush/teaching/6-9-print.pdf
+    N = X.shape[0]
+    w = np.mat(w).T
+    
+    error = (((y - X.dot(w)).T).dot((y - X.dot(w))) / (2*N)) + ((lambd * ((w.T).dot(w))) / 2)
+    error_grad = (((((w.T).dot((X.T).dot(X))) - ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
+    #error_grad = (((-1((w.T).dot((X.T).dot(X))) + ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
+    error_grad = np.ndarray.flatten(np.array(error_grad))
     return error, error_grad
 
 # Aakanksha : Problem 5
@@ -199,11 +206,6 @@ def mapNonLinear(x,p):
     # Xd - (N x (d+1)) 
 	
     # IMPLEMENT THIS METHOD
-    shape = x.shape[0]               # gets the shape of x
-    N = p+1                          # N = p + 1
-    Xd = np.ones((shape,N))          # matrix Xd = (shape of x ) x N
-    for i in range(1, N):            # looping to assign through out the
-        Xd[:, i] = math.pow(x,i)     # assign x^i to the array xd we are making it linear
     return Xd
 
 # Main script
