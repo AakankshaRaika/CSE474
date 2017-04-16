@@ -182,12 +182,19 @@ def learnRidgeRegression(X,y,lambd):
 
 
 def regressionObjVal(w, X, y, lambd):
-
+    
     # compute squared error (scalar) and gradient of squared error with respect
     # to w (vector) for the given data X and y and the regularization parameter
-    # lambda                                                                  
-
-    # IMPLEMENT THIS METHOD                                             
+    # lambda
+    
+    # IMPLEMENT THIS METHOD
+    #https://www.cs.utah.edu/~piyush/teaching/6-9-print.pdf
+    N = X.shape[0]
+    w = np.mat(w).T
+    
+    error = (((y - X.dot(w)).T).dot((y - X.dot(w))) / (2*N)) + ((lambd * ((w.T).dot(w))) / 2)
+    error_grad = (((((w.T).dot((X.T).dot(X))) - ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
+    error_grad = np.ndarray.flatten(np.array(error_grad))
     return error, error_grad
 
 # Aakanksha : Problem 5
@@ -299,7 +306,7 @@ lambdas = np.linspace(0, 1, num=k)
 i = 0
 mses4_train = np.zeros((k,1))
 mses4 = np.zeros((k,1))
-opts = {'maxiter' : 20}    # Preferred value.                                                
+opts = {'maxiter' : 20}    # Preferred value.
 w_init = np.ones((X_i.shape[1],1))
 for lambd in lambdas:
     args = (X_i, y, lambd)
