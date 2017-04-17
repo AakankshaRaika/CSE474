@@ -196,9 +196,13 @@ def regressionObjVal(w, X, y, lambd):
     #https://www.cs.utah.edu/~piyush/teaching/6-9-print.pdf
     N = X.shape[0]
     w = np.mat(w).T
+    y_Xdw = y - np.dot(X, w) 
+                      
     
-    error = (((y - X.dot(w)).T).dot((y - X.dot(w))) / 2 ) + ((lambd * ((w.T).dot(w))) / 2)
-    error_grad = (((((w.T).dot((X.T).dot(X))) - ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
+    error = 0.001  * ( np.dot(y_Xdw.T, y_Xdw) + (lambd * np.dot(w.T, w)) )
+    learning_rate =  0.0005
+    error_grad =  X.T.dot(X.dot(w) - y) * learning_rate
+#    error_grad = (((((w.T).dot((X.T).dot(X))) - ((y.T).dot(X))) / N) + ((w.T) * lambd)).T
     error_grad = np.ndarray.flatten(np.array(error_grad))
     return error, error_grad
 
