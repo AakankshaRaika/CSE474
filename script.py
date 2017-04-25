@@ -137,16 +137,17 @@ def blrPredict(W, data):
 
     ##################
     # YOUR CODE HERE #
-    ##################
-    # HINT: Do not forget to add the bias term to your input data
     
-    x = np.hstack((np.ones((data.shape[0], 1)), data)) #stack arrays in sequence horizontally (column wise)
+     x = np.hstack((np.ones((data.shape[0], 1)), data)) #stack arrays in sequence horizontally (column wise)
     
     probabilty_calc = sigmoid(np.dot(x, W)) #using sigmoid to do dot product of the two arrays
     
-    maximum_number = np.argmax(probability_calc) #return the maximum value along axis
+    maximum_number = np.argmax(probability_calc) #return the maximum value along axis (don't know how to do that yet but will figure it out)
     
     label = label.reshape(data.shape[0], 1)
+    
+    ##################
+    # HINT: Do not forget to add the bias term to your input data
 
     return label
 
