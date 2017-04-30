@@ -103,7 +103,7 @@ def blrObjFunction(initialWeights, *args):
         error_grad: the vector of size (D+1) x 1 representing the gradient of
                     error function
     """
-    train_data, labeli = args
+train_data, labeli = args               #train_data size is D+1 * 1 and size of labali is N*1
 
     n_data = train_data.shape[0]
     n_features = train_data.shape[1]
@@ -114,7 +114,7 @@ def blrObjFunction(initialWeights, *args):
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
-    
+
     #=======================================================================#
     #Makes an new array of size train_data.shape * 1 and fills it with 1's  #
     #then adds that to the training data set as its first columb            #
@@ -129,7 +129,7 @@ def blrObjFunction(initialWeights, *args):
     #Calculate the sigmoid                        #
     #=============================================#
     initialWeights_t = np.reshape(initialWeights,(716,1)) #reshape is nes. if i dont do it, it throws this error
-                                                        #"operands could not be broadcast together with shapes (50000,50000) (50000,716)"
+                                                          #"operands could not be broadcast together with shapes (50000,50000) (50000,716)"
     teta = sigmoid(np.dot(train_data,initialWeights_t))
     #========================================================================#
     #calculation for Error following the equation provided in the description#
@@ -154,7 +154,9 @@ def blrObjFunction(initialWeights, *args):
     #=============================================================================#
     _sum2 = np.multiply((ln_teta - labeli),train_data)
     error_grad = np.sum(_sum2)/x
+    
     return error, error_grad
+
 
 
 def blrPredict(W, data):
