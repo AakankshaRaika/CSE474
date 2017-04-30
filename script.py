@@ -114,7 +114,46 @@ def blrObjFunction(initialWeights, *args):
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
-
+    
+    #=======================================================================#
+    #Makes an new array of size train_data.shape * 1 and fills it with 1's  #
+    #then adds that to the training data set as its first columb            #
+    #=======================================================================#
+    train_data = np.hstack((np.ones((train_data.shape[0],1)),train_data))
+    #====================#
+    #transpose the weight#
+    #====================#
+    initialWeights_t =  np.transpose(initialWeights)
+    #=============================================#
+    #Tetha_n = W^t*initialWeights_n with n = 0...N#
+    #Calculate the sigmoid                        #
+    #=============================================#
+    initialWeights_t = np.reshape(initialWeights,(716,1)) #reshape is nes. if i dont do it, it throws this error
+                                                        #"operands could not be broadcast together with shapes (50000,50000) (50000,716)"
+    teta = sigmoid(np.dot(train_data,initialWeights_t))
+    #========================================================================#
+    #calculation for Error following the equation provided in the description#
+    #========================================================================#
+    ln_teta = np.log(teta)           
+    ln_minusOne_teta = np.log(np.subtract(1.0,teta))
+    minusOne_y = np.subtract(1.0,labeli)
+    
+    one = np.multiply(labeli,ln_teta)
+    two = np.multiply(minusOne_y,ln_minusOne_teta)
+    three = one + two
+    
+    #calculating the sumition#
+    _sum = np.sum(three)
+    
+    #calculating the error by dividing the summition by N#
+    x , y = train_data.shape
+    error = _sum/x          #x = N y = D
+    error = -error
+    #=============================================================================#
+    #calculation for Error_grad following the equation provided in the description#
+    #=============================================================================#
+    _sum2 = np.multiply((ln_teta - labeli),train_data)
+    error_grad = np.sum(_sum2)/x
     return error, error_grad
 
 
