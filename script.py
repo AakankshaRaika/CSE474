@@ -128,7 +128,7 @@ train_data, labeli = args               #train_data size is D+1 * 1 and size of 
     #Tetha_n = W^t*initialWeights_n with n = 0...N#
     #Calculate the sigmoid                        #
     #=============================================#
-    initialWeights_t = np.reshape(initialWeights,(716,1)) #reshape is nes. if i dont do it, it throws this error
+    initialWeights_t = np.reshape(initialWeights,(716,1)).T #reshape is nes. if i dont do it, it throws this error
                                                           #"operands could not be broadcast together with shapes (50000,50000) (50000,716)"
     teta = sigmoid(np.dot(train_data,initialWeights_t))
     #========================================================================#
@@ -148,7 +148,7 @@ train_data, labeli = args               #train_data size is D+1 * 1 and size of 
     #calculating the error by dividing the summition by N#
     x , y = train_data.shape
     error = _sum/x          #x = N y = D
-    error = -error
+    error = -1 * error
     #=============================================================================#
     #calculation for Error_grad following the equation provided in the description#
     #=============================================================================#
