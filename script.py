@@ -183,8 +183,8 @@ def blrPredict(W, data):
     
     probabilty_calc = sigmoid(np.dot(x, W)) #using sigmoid to do dot product of the two arrays
     
-    label = np.argmax(probability_calc, 1) #return the maximum value along axis (test it)
-    
+    label = np.argmax(probability_calc, 1) #return the maximum value row wise (Completed by Chandola and I during office hours, test this)
+   
     ##################
     # HINT: Do not forget to add the bias term to your input data
 
