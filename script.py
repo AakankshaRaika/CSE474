@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.io import loadmat
 from scipy.optimize import minimize
+import pickle
 
 
 def preprocess():
@@ -157,7 +158,6 @@ def blrObjFunction(initialWeights, *args):
     return error, error_grad
 
 
-
 def blrPredict(W, data):
     """
      blrObjFunction predicts the label of data given the data and parameter W 
@@ -178,14 +178,15 @@ def blrPredict(W, data):
     ##################
     # YOUR CODE HERE #
     
-     x = np.hstack((np.ones((data.shape[0], 1)), data)) #stack arrays in sequence horizontally (column wise)
+    x = np.hstack((np.ones((data.shape[0], 1)), data)) #stack arrays in sequence horizontally (column wise)
     
-    probabilty_calc = sigmoid(np.dot(x, W)) #using sigmoid to do dot product of the two arrays
+    p_calc = sigmoid(np.dot(x, W)) #using sigmoid to do dot product of the two arrays
     
-    label = np.argmax(probability_calc, 1) #return the maximum value row wise (Completed by Chandola and I during office hours, test this)
+    label = np.argmax(p_calc, 1) #return the maximum value row wise (Completed by Chandola and I during office hours, test this)
    
     ##################
     # HINT: Do not forget to add the bias term to your input data
+
 
     return label
 
@@ -274,15 +275,24 @@ for i in range(n_class):
 
 # Find the accuracy on Training Dataset
 predicted_label = blrPredict(W, train_data)
-print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
+pl = predicted_label.reshape(predicted_label.size,1)
+print('\n Training set Accuracy:' + str(100 * np.mean((pl == train_label).astype(float))) + '%')
 
 # Find the accuracy on Validation Dataset
 predicted_label = blrPredict(W, validation_data)
-print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%')
+pl = predicted_label.reshape(predicted_label.size,1)
+print('\n Validation set Accuracy:' + str(100 * np.mean((pl == validation_label).astype(float))) + '%')
 
 # Find the accuracy on Testing Dataset
 predicted_label = blrPredict(W, test_data)
-print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
+pl = predicted_label.reshape(predicted_label.size,1)
+print('\n Testing set Accuracy:' + str(100 * np.mean((pl == test_label).astype(float))) + '%')
+
+f1 = open('params.pickle', 'wb') 
+pickle.dump(W, f1) 
+f1.close()
+
+
 
 """
 Script for Support Vector Machine
@@ -317,3 +327,8 @@ print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label_b == va
 # Find the accuracy on Testing Dataset
 predicted_label_b = mlrPredict(W_b, test_data)
 print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_label).astype(float))) + '%')
+
+
+f2 = open('params_bonus.pickle', 'wb')
+pickle.dump(W_b, f2)
+f2.close()
