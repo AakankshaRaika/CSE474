@@ -103,13 +103,13 @@ def blrObjFunction(initialWeights, *args):
         error_grad: the vector of size (D+1) x 1 representing the gradient of
                     error function
     """
-train_data, labeli = args               #train_data size is D+1 * 1 and size of labali is N*1
+    train_data, labeli = args               #train_data size is D+1 * 1 and size of labali is N*1
 
     n_data = train_data.shape[0]
     n_features = train_data.shape[1]
     error = 0
     error_grad = np.zeros((n_features + 1, 1))
-
+    
     ##################
     # YOUR CODE HERE #
     ##################
@@ -123,20 +123,20 @@ train_data, labeli = args               #train_data size is D+1 * 1 and size of 
     #====================#
     #transpose the weight#
     #====================#
-    initialWeights_t =  np.transpose(initialWeights)
+    initialWeights_t = initialWeights.T
+    
     #=============================================#
     #Tetha_n = W^t*initialWeights_n with n = 0...N#
     #Calculate the sigmoid                        #
     #=============================================#
-    initialWeights_t = np.reshape(initialWeights,(716,1)).T #reshape is nes. if i dont do it, it throws this error
-                                                          #"operands could not be broadcast together with shapes (50000,50000) (50000,716)"
+    initialWeights_t = np.reshape(initialWeights_t,(716,1))
     teta = sigmoid(np.dot(train_data,initialWeights_t))
     #========================================================================#
     #calculation for Error following the equation provided in the description#
     #========================================================================#
     ln_teta = np.log(teta)           
-    ln_minusOne_teta = np.log(np.subtract(1.0,teta))
-    minusOne_y = np.subtract(1.0,labeli)
+    ln_minusOne_teta = np.log(1.0-teta)
+    minusOne_y = 1.0 - labeli
     
     one = np.multiply(labeli,ln_teta)
     two = np.multiply(minusOne_y,ln_minusOne_teta)
@@ -148,13 +148,12 @@ train_data, labeli = args               #train_data size is D+1 * 1 and size of 
     #calculating the error by dividing the summition by N#
     x , y = train_data.shape
     error = _sum/x          #x = N y = D
-    error = -1 * error
+    error = -1*error
     #=============================================================================#
     #calculation for Error_grad following the equation provided in the description#
     #=============================================================================#
-    _sum2 = np.multiply((ln_teta - labeli),train_data)
-    error_grad = np.sum(_sum2)/x
-    
+    _sum2 = np.multiply((teta - labeli),train_data)
+    error_grad = np.sum(_sum2,axis=0)/x
     return error, error_grad
 
 
