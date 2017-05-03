@@ -367,6 +367,24 @@ print('\n Testing set Accuracy:' + str(100 * d_gamma.score(test_data,test_label.
 f.write('\n Testing set Accuracy:' + str(100 * d_gamma.score(test_data,test_label.ravel())) + '%')
 f.close()
 
+# do each of 1,10,20...100 for C
+for i in [1.0,10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0]:
+    f = open('C_{}.txt'.format(int(i)),'w')
+    print('\n\n------\n\nC = {}:'.format(i))
+    f.write('\n\n------\n\nC = {}:'.format(i))
+    C_fit = SVC(C = i)
+    start_time = time.time()
+    C_fit.fit(X,y.ravel())
+    learn_time = time.time()-start_time
+    print("learntime:{}".format(learn_time))
+    f.write("learntime:{}".format(learn_time))
+    print('\n Training set Accuracy:' + str(100 * C_fit.score(train_data,train_label.ravel())) + '%')
+    f.write('\n Training set Accuracy:' + str(100 * C_fit.score(train_data,train_label.ravel())) + '%')
+    print('\n Validation set Accuracy:' + str(100 * C_fit.score(validation_data,validation_label.ravel())) + '%')
+    f.write('\n Validation set Accuracy:' + str(100 * C_fit.score(validation_data,validation_label.ravel())) + '%')
+    print('\n Testing set Accuracy:' + str(100 * C_fit.score(test_data,test_label.ravel())) + '%')
+    f.write('\n Testing set Accuracy:' + str(100 * C_fit.score(test_data,test_label.ravel())) + '%')
+    f.close()
 
 
 """
