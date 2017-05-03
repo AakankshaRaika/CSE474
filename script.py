@@ -319,15 +319,43 @@ lin.fit(X,y.ravel())
 learn_time = time.time()-start_time
 print("learntime:{}".format(learn_time))
 f.write("learntime:{}".format(learn_time))
-print('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
-f.write('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
-print('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
-f.write('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
-print('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
-f.write('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
+training_score = lin.score(train_data,train_label.ravel())
+print('\n Training set Accuracy:' + str(100 * training_score) + '%')
+f.write('\n Training set Accuracy:' + str(100 * training_score) + '%')
+v_score = lin.score(validation_data,validation_label.ravel())
+print('\n Validation set Accuracy:' + str(100 * v_score) + '%')
+f.write('\n Validation set Accuracy:' + str(100 * v_score) + '%')
+test_score =  lin.score(test_data,test_label.ravel())
+print('\n Testing set Accuracy:' + str(100 * test_score) + '%')
+f.write('\n Testing set Accuracy:' + str(100 * test_score) + '%')
 f.close()
 
 
+
+
+
+
+
+#use default gamma
+f = open('gamma_default.txt','w')
+print('\n\n------\n\defaultgamma:')
+f.write('\n\n------\n\ndefaultgamma:')
+d_gamma = SVC()
+start_time = time.time()
+d_gamma.fit(X,y.ravel())
+learn_time = time.time()-start_time
+print("learntime:{}".format(learn_time))
+f.write("learntime:{}".format(learn_time))
+training_score = d_gamma.score(train_data,train_label.ravel())
+print('\n Training set Accuracy:' + str(100 * training_score) + '%')
+f.write('\n Training set Accuracy:' + str(100 * training_score) + '%')
+v_score = d_gamma.score(validation_data,validation_label.ravel())
+print('\n Validation set Accuracy:' + str(100 * v_score) + '%')
+f.write('\n Validation set Accuracy:' + str(100 * v_score) + '%')
+test_score =  d_gamma.score(test_data,test_label.ravel())
+print('\n Testing set Accuracy:' + str(100 * test_score) + '%')
+f.write('\n Testing set Accuracy:' + str(100 * test_score) + '%')
+f.close()
 
 #use gamma of 1
 f = open('gamma_1.txt','w')
@@ -339,32 +367,15 @@ gamma1.fit(X,y.ravel())
 learn_time = time.time()-start_time
 print("learntime:{}".format(learn_time))
 f.write("learntime:{}".format(learn_time))
-print('\n Training set Accuracy:' + str(100 * gamma1.score(train_data,train_label.ravel())) + '%')
-f.write('\n Training set Accuracy:' + str(100 * gamma1.score(train_data,train_label.ravel())) + '%')
-print('\n Validation set Accuracy:' + str(100 * gamma1.score(validation_data,validation_label.ravel())) + '%')
-f.write('\n Validation set Accuracy:' + str(100 * gamma1.score(validation_data,validation_label.ravel())) + '%')
-print('\n Testing set Accuracy:' + str(100 * gamma1.score(test_data,test_label.ravel())) + '%')
-f.write('\n Testing set Accuracy:' + str(100 * gamma1.score(test_data,test_label.ravel())) + '%')
-f.close()
-
-
-
-#use default gamma
-f = open('gamma_1.txt','w')
-print('\n\n------\n\defaultgamma:')
-f.write('\n\n------\n\ndefaultgamma:')
-d_gamma = SVC()
-start_time = time.time()
-d_gamma.fit(X,y.ravel())
-learn_time = time.time()-start_time
-print("learntime:{}".format(learn_time))
-f.write("learntime:{}".format(learn_time))
-print('\n Training set Accuracy:' + str(100 * d_gamma.score(train_data,train_label.ravel())) + '%')
-f.write('\n Training set Accuracy:' + str(100 * d_gamma.score(train_data,train_label.ravel())) + '%')
-print('\n Validation set Accuracy:' + str(100 * d_gamma.score(validation_data,validation_label.ravel())) + '%')
-f.write('\n Validation set Accuracy:' + str(100 * d_gamma.score(validation_data,validation_label.ravel())) + '%')
-print('\n Testing set Accuracy:' + str(100 * d_gamma.score(test_data,test_label.ravel())) + '%')
-f.write('\n Testing set Accuracy:' + str(100 * d_gamma.score(test_data,test_label.ravel())) + '%')
+training_score = gamma1.score(train_data,train_label.ravel())
+print('\n Training set Accuracy:' + str(100 * training_score) + '%')
+f.write('\n Training set Accuracy:' + str(100 * training_score) + '%')
+v_score = gamma1.score(validation_data,validation_label.ravel())
+print('\n Validation set Accuracy:' + str(100 * v_score) + '%')
+f.write('\n Validation set Accuracy:' + str(100 * v_score) + '%')
+test_score =  gamma1.score(test_data,test_label.ravel())
+print('\n Testing set Accuracy:' + str(100 * test_score) + '%')
+f.write('\n Testing set Accuracy:' + str(100 * test_score) + '%')
 f.close()
 
 # do each of 1,10,20...100 for C
