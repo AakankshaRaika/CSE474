@@ -9,7 +9,6 @@ def preprocess():
      Input:
      Although this function doesn't have any input, you are required to load
      the MNIST data set from file 'mnist_all.mat'.
-
      Output:
      train_data: matrix of training set. Each row of train_data contains 
        feature vector of a image
@@ -93,12 +92,10 @@ def blrObjFunction(initialWeights, *args):
     """
     blrObjFunction computes 2-class Logistic Regression error function and
     its gradient.
-
     Input:
         initialWeights: the weight vector (w_k) of size (D + 1) x 1 
         train_data: the data matrix of size N x D
         labeli: the label vector (y_k) of size N x 1 where each entry can be either 0 or 1 representing the label of corresponding feature vector
-
     Output: 
         error: the scalar value of error function of 2-class logistic regression
         error_grad: the vector of size (D+1) x 1 representing the gradient of
@@ -171,7 +168,6 @@ def blrPredict(W, data):
      Output: 
          label: vector of size N x 1 representing the predicted label of 
          corresponding feature vector given in data matrix
-
     """
     label = np.zeros((data.shape[0], 1))
 
@@ -195,13 +191,11 @@ def mlrObjFunction(params, *args):
     """
     mlrObjFunction computes multi-class Logistic Regression error function and
     its gradient.
-
     Input:
         initialWeights: the weight vector of size (D + 1) x 1
         train_data: the data matrix of size N x D
         labeli: the label vector of size N x 1 where each entry can be either 0 or 1
                 representing the label of corresponding feature vector
-
     Output:
         error: the scalar value of error function of multi-class logistic regression
         error_grad: the vector of size (D+1) x 10 representing the gradient of
@@ -224,16 +218,13 @@ def mlrPredict(W, data):
     """
      mlrObjFunction predicts the label of data given the data and parameter W
      of Logistic Regression
-
      Input:
          W: the matrix of weight of size (D + 1) x 10. Each column is the weight
          vector of a Logistic Regression classifier.
          X: the data matrix of size N x D
-
      Output:
          label: vector of size N x 1 representing the predicted label of
          corresponding feature vector given in data matrix
-
     """
     label = np.zeros((data.shape[0], 1))
 
@@ -263,7 +254,7 @@ Y = np.zeros((n_train, n_class))
 for i in range(n_class):
     Y[:, i] = (train_label == i).astype(int).ravel()
 
-# Logistic Regression with Gradient Descent
+## Logistic Regression with Gradient Descent
 W = np.zeros((n_feature + 1, n_class))
 initialWeights = np.zeros((n_feature + 1, 1))
 opts = {'maxiter': 100}
@@ -378,7 +369,7 @@ print('\n Testing set Accuracy:' + str(100 * test_score) + '%')
 f.write('\n Testing set Accuracy:' + str(100 * test_score) + '%')
 f.close()
 
-# do each of 1,10,20...100 for C
+## do each of 1,10,20...100 for C
 for i in [1.0,10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0]:
     f = open('C_{}.txt'.format(int(i)),'w')
     print('\n\n------\n\nC = {}:'.format(i))
@@ -389,12 +380,15 @@ for i in [1.0,10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0]:
     learn_time = time.time()-start_time
     print("learntime:{}".format(learn_time))
     f.write("learntime:{}".format(learn_time))
-    print('\n Training set Accuracy:' + str(100 * C_fit.score(train_data,train_label.ravel())) + '%')
-    f.write('\n Training set Accuracy:' + str(100 * C_fit.score(train_data,train_label.ravel())) + '%')
-    print('\n Validation set Accuracy:' + str(100 * C_fit.score(validation_data,validation_label.ravel())) + '%')
-    f.write('\n Validation set Accuracy:' + str(100 * C_fit.score(validation_data,validation_label.ravel())) + '%')
-    print('\n Testing set Accuracy:' + str(100 * C_fit.score(test_data,test_label.ravel())) + '%')
-    f.write('\n Testing set Accuracy:' + str(100 * C_fit.score(test_data,test_label.ravel())) + '%')
+    train_acc = C_fit.score(train_data,train_label.ravel())
+    print('\n Training set Accuracy:' + str(100 * train_acc) + '%')
+    f.write('\n Training set Accuracy:' + str(100 * train_acc) + '%')
+    v_acc = C_fit.score(validation_data,validation_label.ravel())
+    print('\n Validation set Accuracy:' + str(100 * v_acc) + '%')
+    f.write('\n Validation set Accuracy:' + str(100 * v_acc) + '%')
+    test_acc = C_fit.score(test_data,test_label.ravel())
+    print('\n Testing set Accuracy:' + str(100 * test_acc) + '%')
+    f.write('\n Testing set Accuracy:' + str(100 * test_acc) + '%')
     f.close()
 
 
