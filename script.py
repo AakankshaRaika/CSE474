@@ -303,6 +303,71 @@ print('\n\n--------------SVM-------------------\n\n')
 # YOUR CODE HERE #
 ##################
 
+from sklearn.svm import SVC
+import time
+
+X = train_data
+y = train_label
+
+#use a linear kernel
+f = open('linear.txt','w')
+print('\n\n------\n\nlinear:')
+f.write('\n\n------\n\nlinear:')
+lin = SVC(kernel = 'linear')
+start_time = time.time()
+lin.fit(X,y.ravel())
+learn_time = time.time()-start_time
+print("learntime:{}".format(learn_time))
+f.write("learntime:{}".format(learn_time))
+print('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
+f.write('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
+print('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
+f.write('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
+print('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
+f.write('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
+f.close()
+
+
+
+#use gamma of 1
+f = open('gamma_1.txt','w')
+print('\n\n------\n\ngamma = 1:')
+f.write('\n\n------\n\nngamma = 1:')
+gamma1 = SVC(gamma = 1)
+start_time = time.time()
+gamma1.fit(X,y.ravel())
+learn_time = time.time()-start_time
+print("learntime:{}".format(learn_time))
+f.write("learntime:{}".format(learn_time))
+print('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
+f.write('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
+print('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
+f.write('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
+print('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
+f.write('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
+f.close()
+
+
+
+#use default gamma
+f = open('gamma_1.txt','w')
+print('\n\n------\n\defaultgamma:')
+f.write('\n\n------\n\ndefaultgamma:')
+d_gamma = SVC()
+start_time = time.time()
+d_gamma.fit(X,y.ravel())
+learn_time = time.time()-start_time
+print("learntime:{}".format(learn_time))
+f.write("learntime:{}".format(learn_time))
+print('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
+f.write('\n Training set Accuracy:' + str(100 * lin.score(train_data,train_label.ravel())) + '%')
+print('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
+f.write('\n Validation set Accuracy:' + str(100 * lin.score(validation_data,validation_label.ravel())) + '%')
+print('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
+f.write('\n Testing set Accuracy:' + str(100 * lin.score(test_data,test_label.ravel())) + '%')
+f.close()
+
+
 
 """
 Script for Extra Credit Part
