@@ -1,0 +1,8 @@
+
+
+------
+
+linear:learntime:229.75988483428955
+ Training set Accuracy:97.286%
+ Validation set Accuracy:93.64%
+ Testing set Accuracy:93.78%

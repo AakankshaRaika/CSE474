@@ -1,0 +1,8 @@
+
+
+------
+
+defaultgamma:learntime:374.2905387878418
+ Training set Accuracy:97.286%
+ Validation set Accuracy:93.64%
+ Testing set Accuracy:93.78%

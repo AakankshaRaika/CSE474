@@ -1,0 +1,8 @@
+
+
+------
+
+C = 30.0:learntime:175.7782814502716
+ Training set Accuracy:97.286%
+ Validation set Accuracy:93.64%
+ Testing set Accuracy:93.78%
